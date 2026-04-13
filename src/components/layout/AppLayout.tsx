@@ -27,12 +27,16 @@ const adminLinks = [
 
 function AppSidebarContent() {
   const { role, userName, logout } = useAuth();
-  const { state } = useSidebar();
+  const { state, setOpenMobile, isMobile } = useSidebar();
   const collapsed = state === "collapsed";
   const links = adminLinks;
 
+  const handleLinkClick = () => {
+    if (isMobile) setOpenMobile(false);
+  };
+
   return (
-    <Sidebar collapsible="icon" side="right">
+    <Sidebar collapsible="offcanvas" side="right">
       <SidebarContent className="flex flex-col justify-between h-full">
         <div>
           {/* Logo */}
@@ -41,7 +45,7 @@ function AppSidebarContent() {
               <div className="w-8 h-8 rounded-lg bg-sidebar-primary flex items-center justify-center flex-shrink-0">
                 <ClipboardCheck className="w-4 h-4 text-sidebar-primary-foreground" />
               </div>
-              {!collapsed && <span className="font-bold text-sidebar-foreground text-sm">منصة التقييم</span>}
+              <span className="font-bold text-sidebar-foreground text-sm">منصة التقييم</span>
             </div>
           </div>
 
@@ -51,9 +55,9 @@ function AppSidebarContent() {
                 {links.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
-                      <NavLink to={item.url} end className="hover:bg-sidebar-accent" activeClassName="bg-sidebar-accent text-sidebar-primary font-medium">
+                      <NavLink to={item.url} end className="hover:bg-sidebar-accent" activeClassName="bg-sidebar-accent text-sidebar-primary font-medium" onClick={handleLinkClick}>
                         <item.icon className="w-4 h-4 ml-2" />
-                        {!collapsed && <span>{item.title}</span>}
+                        <span>{item.title}</span>
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -65,17 +69,15 @@ function AppSidebarContent() {
 
         {/* User info & logout */}
         <div className="p-4 border-t border-sidebar-border">
-          {!collapsed && (
-            <p className="text-xs text-sidebar-foreground/60 mb-2">{userName}</p>
-          )}
+          <p className="text-xs text-sidebar-foreground/60 mb-2">{userName}</p>
           <Button
             variant="ghost"
             size="sm"
-            onClick={logout}
+            onClick={() => { handleLinkClick(); logout(); }}
             className="w-full justify-start gap-2 text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent"
           >
             <LogOut className="w-4 h-4" />
-            {!collapsed && "تسجيل الخروج"}
+            تسجيل الخروج
           </Button>
         </div>
       </SidebarContent>
