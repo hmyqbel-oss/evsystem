@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { sections } from "@/data/assessmentQuestions";
-import { sampleOrganizations } from "@/data/sampleData";
 import { getOverallScore, getScoreLabel, getScoreColor } from "@/data/sampleData";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import RatingInput from "@/components/evaluation/RatingInput";
 
 const EvaluationForm = () => {
+  const [orgs, setOrgs] = useState<{ id: string; name: string; city: string; region: string; license_number: string; members_count: number }[]>([]);
   const [selectedOrgId, setSelectedOrgId] = useState<string>("");
   const [currentSection, setCurrentSection] = useState(0);
   const [scores, setScores] = useState<Record<number, number>>({});
@@ -21,8 +22,14 @@ const EvaluationForm = () => {
   const answeredCount = Object.keys(scores).length;
   const progressPct = Math.round((answeredCount / totalQuestions) * 100);
 
+  useEffect(() => {
+    supabase.from("organizations").select("id, name, city, region, license_number, members_count").then(({ data }) => {
+      if (data) setOrgs(data);
+    });
+  }, []);
+
   const section = sections[currentSection];
-  const selectedOrg = sampleOrganizations.find((o) => o.id === selectedOrgId);
+  const selectedOrg = orgs.find((o) => o.id === selectedOrgId);
 
   const handleScore = (questionId: number, score: number) => {
     setScores((prev) => ({ ...prev, [questionId]: score }));
@@ -68,7 +75,7 @@ const EvaluationForm = () => {
                 <SelectValue placeholder="اختر الجمعية..." />
               </SelectTrigger>
               <SelectContent>
-                {sampleOrganizations.map((org) => (
+                {orgs.map((org) => (
                   <SelectItem key={org.id} value={org.id}>
                     <div className="flex items-center gap-2">
                       <span>{org.name}</span>
@@ -80,11 +87,11 @@ const EvaluationForm = () => {
             </Select>
             {selectedOrg && (
               <div className="flex items-center gap-4 text-xs text-muted-foreground bg-muted/50 rounded-lg p-3">
-                <span>ترخيص: {selectedOrg.licenseNumber}</span>
+                <span>ترخيص: {selectedOrg.license_number}</span>
                 <span>•</span>
                 <span>{selectedOrg.city} — {selectedOrg.region}</span>
                 <span>•</span>
-                <span>{selectedOrg.membersCount} عضو</span>
+                <span>{selectedOrg.members_count} عضو</span>
               </div>
             )}
             {!selectedOrgId && (
