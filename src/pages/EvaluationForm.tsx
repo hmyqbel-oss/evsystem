@@ -139,18 +139,18 @@ const EvaluationForm = () => {
         </Card>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-2">
+      <div className="grid grid-cols-1 sm:grid-cols-5 gap-1 bg-card rounded-xl shadow-sm border p-1.5">
         {sections.map((s, i) => {
           const sAnswered = s.questions.filter((q) => scores[q.id]).length;
           const isComplete = sAnswered === s.questions.length;
           return (
             <button key={s.name} onClick={() => { setCurrentSection(i); window.scrollTo(0, 0); }}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                i === currentSection ? "bg-primary text-primary-foreground shadow-md" : "bg-card text-muted-foreground hover:bg-secondary"
+              className={`flex items-center sm:flex-col sm:items-center gap-2 sm:gap-1 px-3 sm:px-2 py-2.5 rounded-lg text-xs font-medium transition-all ${
+                i === currentSection ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:bg-muted/50"
               }`}>
               {isComplete && <CheckCircle2 className="w-4 h-4" />}
-              {s.name}
-              <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+              <span className="truncate text-right sm:text-center leading-tight flex-1 sm:flex-none sm:w-full" style={{ fontSize: '11px' }}>{s.name}</span>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
                 i === currentSection ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"
               }`}>{sAnswered}/{s.questions.length}</span>
             </button>

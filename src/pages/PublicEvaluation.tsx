@@ -379,7 +379,7 @@ const PublicEvaluation = () => {
           </CardContent>
         </Card>
 
-        <div className="bg-card rounded-xl shadow-sm border p-1.5 flex items-center gap-1 overflow-x-auto">
+        <div className="bg-card rounded-xl shadow-sm border p-1.5 grid grid-cols-1 sm:grid-cols-5 gap-1">
           {sections.map((s, i) => {
             const sAnswered = s.questions.filter((q) => scores[q.id]).length;
             const isComplete = sAnswered === s.questions.length;
@@ -389,7 +389,7 @@ const PublicEvaluation = () => {
                 key={s.name}
                 onClick={() => { setCurrentSection(i); window.scrollTo(0, 0); }}
                 whileTap={{ scale: 0.95 }}
-                className={`relative flex-1 min-w-[80px] flex flex-col items-center gap-1 px-2 py-2.5 rounded-lg text-xs font-medium transition-colors duration-200 ${
+                className={`relative flex items-center sm:flex-col sm:items-center gap-2 sm:gap-1 px-3 sm:px-2 py-2.5 rounded-lg text-xs font-medium transition-colors duration-200 ${
                   isActive
                     ? "bg-primary text-primary-foreground shadow-md"
                     : "text-muted-foreground hover:bg-muted/50"
@@ -404,7 +404,7 @@ const PublicEvaluation = () => {
                     <CheckCircle2 className="w-3 h-3 text-success-foreground" />
                   </motion.span>
                 )}
-                <span className="truncate w-full text-center leading-tight" style={{ fontSize: '11px' }}>{s.name}</span>
+                <span className="truncate text-right sm:text-center leading-tight flex-1 sm:flex-none sm:w-full" style={{ fontSize: '11px' }}>{s.name}</span>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold transition-colors duration-200 ${
                   isActive ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"
                 }`}>
