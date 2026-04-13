@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { ClipboardCheck, Loader2 } from "lucide-react";
+import { ClipboardCheck, Loader2, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const LoginPage = () => {
@@ -79,6 +79,12 @@ const LoginPage = () => {
               <Button type="submit" className="w-full" size="lg" disabled={loading}>
                 {loading ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : null}
                 دخول
+              </Button>
+              <Button variant="ghost" size="sm" className="w-full" asChild>
+                <Link to="/">
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                  العودة للصفحة الرئيسية
+                </Link>
               </Button>
             </form>
           </CardContent>
