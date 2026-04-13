@@ -10,6 +10,16 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
 
+const FormField = ({ label, icon: Icon, children }: { label: string; icon: any; children: React.ReactNode }) => (
+  <div className="space-y-1.5">
+    <label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+      <Icon className="w-3.5 h-3.5" />
+      {label}
+    </label>
+    {children}
+  </div>
+);
+
 const OrganizationsPage = () => {
   const [organizations, setOrganizations] = useState<Organization[]>(sampleOrganizations);
   const [isOpen, setIsOpen] = useState(false);
@@ -59,16 +69,6 @@ const OrganizationsPage = () => {
 
   const filtered = organizations.filter(o =>
     o.name.includes(searchQuery) || o.city.includes(searchQuery) || o.region.includes(searchQuery)
-  );
-
-  const FormField = ({ label, icon: Icon, children }: { label: string; icon: any; children: React.ReactNode }) => (
-    <div className="space-y-1.5">
-      <label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
-        <Icon className="w-3.5 h-3.5" />
-        {label}
-      </label>
-      {children}
-    </div>
   );
 
   const orgForm = (
