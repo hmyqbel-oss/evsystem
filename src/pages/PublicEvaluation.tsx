@@ -353,7 +353,7 @@ const PublicEvaluation = () => {
           </CardContent>
         </Card>
 
-        <div className="flex gap-2 overflow-x-auto pb-2">
+        <div className="flex flex-wrap gap-2">
           {sections.map((s, i) => {
             const sAnswered = s.questions.filter((q) => scores[q.id]).length;
             const isComplete = sAnswered === s.questions.length;
@@ -361,15 +361,15 @@ const PublicEvaluation = () => {
               <button
                 key={s.name}
                 onClick={() => setCurrentSection(i)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                   i === currentSection
                     ? "bg-primary text-primary-foreground shadow-md"
                     : "bg-card text-muted-foreground hover:bg-secondary"
                 }`}
               >
-                {isComplete && <CheckCircle2 className="w-4 h-4" />}
-                {s.name}
-                <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                {isComplete && <CheckCircle2 className="w-3.5 h-3.5" />}
+                <span className="truncate max-w-[120px] sm:max-w-none">{s.name}</span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                   i === currentSection ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"
                 }`}>
                   {sAnswered}/{s.questions.length}
