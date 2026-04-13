@@ -249,6 +249,27 @@ const PublicEvaluation = () => {
             </div>
           </motion.div>
 
+          {/* Welcome Message */}
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+            <Card className="shadow-sm border-primary/20 overflow-hidden">
+              <div className="relative bg-gradient-to-bl from-primary/10 via-primary/5 to-transparent p-5 sm:p-6">
+                <div className="absolute top-0 left-0 w-24 h-24 bg-primary/5 rounded-full -translate-x-1/2 -translate-y-1/2" />
+                <div className="absolute bottom-0 right-0 w-16 h-16 bg-primary/5 rounded-full translate-x-1/3 translate-y-1/3" />
+                <div className="relative space-y-3 text-right">
+                  <p className="text-xs sm:text-sm leading-relaxed text-foreground/85">
+                    في إطار مشروع تطوير نماذج الاستدامة وتعزيز أثر الجمعيات الشبابية، تم تطوير هذه الأداة لفهم واقع الجمعيات وتحليل قدراتها وتحديد فرص التطوير بناءً على بيانات دقيقة.
+                  </p>
+                  <p className="text-xs sm:text-sm leading-relaxed text-foreground/85">
+                    تعتمد مخرجات المشروع بشكل مباشر على جودة البيانات المقدمة، حيث تسهم مشاركتكم الصادقة في تكوين صورة واقعية، وتحديد الفجوات، ودعم تصميم حلول عملية.
+                  </p>
+                  <p className="text-xs sm:text-sm leading-relaxed text-foreground/85 font-medium">
+                    نؤكد أن الهدف هو تمكين الجمعيات وتعزيز استدامتها، وليس التقييم الرقابي؛ لذا نأمل تعبئة البيانات بمصداقية عالية لضمان تحقيق أفضل النتائج لكم.
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+
           {/* Section 1: Organization Info */}
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <Card className="shadow-sm overflow-hidden">
