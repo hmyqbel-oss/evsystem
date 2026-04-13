@@ -302,10 +302,14 @@ const PublicEvaluation = () => {
           </motion.div>
 
           {/* Proceed Button */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <Button onClick={handleProceedToEvaluation} disabled={saving} className="w-full h-12 gap-2 text-base font-medium shadow-md">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="flex flex-col sm:flex-row gap-3">
+            <Button variant="outline" onClick={handleSaveOrgOnly} disabled={saving} className="flex-1 h-12 gap-2 text-base font-medium">
+              {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+              حفظ بيانات الجمعية
+            </Button>
+            <Button onClick={handleProceedToEvaluation} disabled={saving} className="flex-1 h-12 gap-2 text-base font-medium shadow-md">
               {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <ChevronLeft className="w-5 h-5" />}
-              الانتقال لمرحلة التقييم
+              الانتقال للتقييم
             </Button>
           </motion.div>
         </div>
