@@ -19,13 +19,9 @@ import { ReactNode } from "react";
 
 const adminLinks = [
   { title: "لوحة التحكم", url: "/dashboard", icon: LayoutDashboard },
+  { title: "التقييمات", url: "/evaluations", icon: ClipboardCheck },
   { title: "المنظمات", url: "/organizations", icon: Building2 },
   { title: "المستخدمون", url: "/users", icon: Users },
-  { title: "النتائج", url: "/results", icon: FileBarChart },
-];
-
-const evaluatorLinks = [
-  { title: "التقييمات", url: "/evaluations", icon: ClipboardCheck },
   { title: "النتائج", url: "/results", icon: FileBarChart },
 ];
 
@@ -33,7 +29,7 @@ function AppSidebarContent() {
   const { role, userName, logout } = useAuth();
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const links = role === "admin" ? adminLinks : evaluatorLinks;
+  const links = adminLinks;
 
   return (
     <Sidebar collapsible="icon" side="right">
