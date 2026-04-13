@@ -32,12 +32,12 @@ function AppRoutes() {
 
   return (
     <Routes>
-      {/* Public evaluation - no login required */}
-      <Route path="/public-evaluation" element={<PublicEvaluation />} />
+      {/* Public home - evaluation form */}
+      <Route path="/" element={<PublicEvaluation />} />
+      <Route path="/public-evaluation" element={<Navigate to="/" replace />} />
 
       {/* Admin routes */}
       <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
-      <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/evaluations" element={<ProtectedRoute><EvaluationsListPage /></ProtectedRoute>} />
       <Route path="/organizations" element={<ProtectedRoute><OrganizationsPage /></ProtectedRoute>} />
