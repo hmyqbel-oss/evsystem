@@ -17,7 +17,6 @@ interface EvaluationRow {
   visit_number: number;
   created_at: string;
   organizations: { name: string } | null;
-  profiles: { full_name: string } | null;
 }
 
 const EvaluationsListPage = () => {
