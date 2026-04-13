@@ -81,9 +81,10 @@ const PublicEvaluation = () => {
         const { error } = await supabase.from("organizations").update(payload).eq("id", orgId);
         if (error) throw error;
       } else {
-        const { data, error } = await supabase.from("organizations").insert(payload).select("id").single();
+        const newId = crypto.randomUUID();
+        const { error } = await supabase.from("organizations").insert({ ...payload, id: newId });
         if (error) throw error;
-        setOrgId(data.id);
+        setOrgId(newId);
       }
       return true;
     } catch (err: any) {
