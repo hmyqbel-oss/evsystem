@@ -21,15 +21,49 @@ type Step = "org-info" | "evaluation" | "thank-you";
 
 function TopBar() {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-foreground">منصة التقييم الذاتي</h2>
-        <Button variant="ghost" size="sm" onClick={() => navigate("/login")} className="gap-2 text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <ClipboardCheck className="w-5 h-5 text-primary" />
+          <h2 className="text-sm font-semibold text-foreground">منصة التقييم الذاتي</h2>
+        </div>
+        {/* Desktop */}
+        <Button variant="ghost" size="sm" onClick={() => navigate("/login")} className="hidden sm:flex gap-2 text-muted-foreground">
           <LogIn className="w-4 h-4" />
           تسجيل الدخول
         </Button>
+        {/* Mobile hamburger */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="sm:hidden flex flex-col gap-[5px] p-2 rounded-md hover:bg-muted transition-colors"
+          aria-label="القائمة"
+        >
+          <motion.span animate={menuOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }} transition={{ duration: 0.25 }} className="block w-5 h-[2px] bg-foreground rounded-full origin-center" />
+          <motion.span animate={menuOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }} transition={{ duration: 0.2 }} className="block w-5 h-[2px] bg-foreground rounded-full" />
+          <motion.span animate={menuOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }} transition={{ duration: 0.25 }} className="block w-5 h-[2px] bg-foreground rounded-full origin-center" />
+        </button>
       </div>
+      {/* Mobile menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="sm:hidden overflow-hidden border-t border-border"
+          >
+            <div className="px-4 py-3 space-y-2">
+              <Button variant="ghost" size="sm" onClick={() => { navigate("/login"); setMenuOpen(false); }} className="w-full justify-start gap-2 text-muted-foreground">
+                <LogIn className="w-4 h-4" />
+                تسجيل الدخول
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
