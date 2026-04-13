@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronRight, ChevronLeft, Save, Send, CheckCircle2,
   Building2, Loader2, ClipboardCheck, PartyPopper, LogIn,
+  MapPin, Briefcase, User, BadgeCheck, Mail, Phone,
 } from "lucide-react";
 import { toast } from "sonner";
 import RatingInput from "@/components/evaluation/RatingInput";
@@ -36,8 +37,8 @@ function TopBar() {
 const PublicEvaluation = () => {
   const [step, setStep] = useState<Step>("org-info");
   const [orgForm, setOrgForm] = useState({
-    name: "", city: "", region: "", license_number: "",
-    members_count: 0, email: "", phone: "", founded_date: "",
+    name: "", city: "", region: "", specialty: "",
+    data_entry_name: "", data_entry_role: "", email: "", phone: "",
   });
   const [currentSection, setCurrentSection] = useState(0);
   const [scores, setScores] = useState<Record<number, number>>({});
@@ -49,13 +50,17 @@ const PublicEvaluation = () => {
   const answeredCount = Object.keys(scores).length;
   const progressPct = Math.round((answeredCount / totalQuestions) * 100);
 
-  const handleOrgFormChange = (field: string, value: string | number) => {
+  const handleOrgFormChange = (field: string, value: string) => {
     setOrgForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleProceedToEvaluation = async () => {
     if (!orgForm.name.trim()) {
       toast.error("يرجى إدخال اسم الجمعية");
+      return;
+    }
+    if (!orgForm.data_entry_name.trim()) {
+      toast.error("يرجى إدخال اسم مدخل البيانات");
       return;
     }
     setSaving(true);
@@ -66,11 +71,11 @@ const PublicEvaluation = () => {
           name: orgForm.name,
           city: orgForm.city,
           region: orgForm.region,
-          license_number: orgForm.license_number,
-          members_count: orgForm.members_count,
+          specialty: orgForm.specialty,
+          data_entry_name: orgForm.data_entry_name,
+          data_entry_role: orgForm.data_entry_role,
           email: orgForm.email,
           phone: orgForm.phone,
-          founded_date: orgForm.founded_date || null,
         })
         .select("id")
         .single();
@@ -173,7 +178,12 @@ const PublicEvaluation = () => {
       <div className="min-h-screen bg-background">
         <TopBar />
         <div className="max-w-2xl mx-auto p-4 md:p-8 space-y-6">
-          <div className="text-center space-y-3">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center space-y-3"
+          >
             <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center">
               <ClipboardCheck className="w-8 h-8 text-primary" />
             </div>
@@ -184,40 +194,107 @@ const PublicEvaluation = () => {
               <StepIndicator active={false} label="التقييم" number={2} />
               <StepIndicator active={false} label="الإرسال" number={3} />
             </div>
-          </div>
+          </motion.div>
 
-          <Card className="shadow-sm">
-            <CardContent className="p-5 space-y-4">
-              <div className="flex items-center gap-2 mb-2">
+          {/* Section 1: Organization Info */}
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+            <Card className="shadow-sm overflow-hidden">
+              <div className="bg-primary/5 border-b px-5 py-3 flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-primary" />
-                <h2 className="text-base font-semibold text-foreground">بيانات الجمعية</h2>
+                <h2 className="text-sm font-semibold text-foreground">معلومات الجمعية</h2>
               </div>
-              <p className="text-sm text-muted-foreground">يرجى تعبئة بيانات الجمعية للمتابعة</p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField label="اسم الجمعية" value={orgForm.name} onChange={(v) => handleOrgFormChange("name", v)} required />
-                <FormField label="رقم الترخيص" value={orgForm.license_number} onChange={(v) => handleOrgFormChange("license_number", v)} />
-                <FormField label="المدينة" value={orgForm.city} onChange={(v) => handleOrgFormChange("city", v)} />
-                <FormField label="المنطقة" value={orgForm.region} onChange={(v) => handleOrgFormChange("region", v)} />
-                <FormField label="البريد الإلكتروني" value={orgForm.email} onChange={(v) => handleOrgFormChange("email", v)} type="email" />
-                <FormField label="رقم الهاتف" value={orgForm.phone} onChange={(v) => handleOrgFormChange("phone", v)} type="tel" />
-                <FormField label="تاريخ التأسيس" value={orgForm.founded_date} onChange={(v) => handleOrgFormChange("founded_date", v)} type="date" />
-                <div className="space-y-2">
-                  <Label className="text-sm">عدد الأعضاء</Label>
+              <CardContent className="p-5 space-y-4">
+                <IconField icon={Building2} label="اسم الجمعية" required>
                   <Input
-                    type="number"
-                    value={orgForm.members_count}
-                    onChange={(e) => handleOrgFormChange("members_count", Number(e.target.value))}
+                    value={orgForm.name}
+                    onChange={(e) => handleOrgFormChange("name", e.target.value)}
+                    placeholder="مثال: جمعية التنمية الاجتماعية"
                   />
+                </IconField>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <IconField icon={MapPin} label="المنطقة">
+                    <Input
+                      value={orgForm.region}
+                      onChange={(e) => handleOrgFormChange("region", e.target.value)}
+                      placeholder="مثال: منطقة الرياض"
+                    />
+                  </IconField>
+                  <IconField icon={MapPin} label="المدينة">
+                    <Input
+                      value={orgForm.city}
+                      onChange={(e) => handleOrgFormChange("city", e.target.value)}
+                      placeholder="مثال: الرياض"
+                    />
+                  </IconField>
                 </div>
-              </div>
+                <IconField icon={Briefcase} label="مجال تخصص الجمعية">
+                  <Input
+                    value={orgForm.specialty}
+                    onChange={(e) => handleOrgFormChange("specialty", e.target.value)}
+                    placeholder="مثال: التنمية المجتمعية، رعاية الأيتام..."
+                  />
+                </IconField>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-              <Button onClick={handleProceedToEvaluation} disabled={saving} className="w-full gap-2 mt-4">
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <ChevronLeft className="w-4 h-4" />}
-                الانتقال لمرحلة التقييم
-              </Button>
-            </CardContent>
-          </Card>
+          {/* Section 2: Data Entry Person */}
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <Card className="shadow-sm overflow-hidden">
+              <div className="bg-accent/5 border-b px-5 py-3 flex items-center gap-2">
+                <User className="w-5 h-5 text-accent-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">بيانات مدخل البيانات</h2>
+              </div>
+              <CardContent className="p-5 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <IconField icon={User} label="اسم مدخل البيانات" required>
+                    <Input
+                      value={orgForm.data_entry_name}
+                      onChange={(e) => handleOrgFormChange("data_entry_name", e.target.value)}
+                      placeholder="الاسم الكامل"
+                    />
+                  </IconField>
+                  <IconField icon={BadgeCheck} label="صفته في الجمعية">
+                    <Input
+                      value={orgForm.data_entry_role}
+                      onChange={(e) => handleOrgFormChange("data_entry_role", e.target.value)}
+                      placeholder="مثال: مدير تنفيذي، مسؤول الجودة..."
+                    />
+                  </IconField>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <IconField icon={Mail} label="البريد الإلكتروني">
+                    <Input
+                      type="email"
+                      value={orgForm.email}
+                      onChange={(e) => handleOrgFormChange("email", e.target.value)}
+                      placeholder="example@org.sa"
+                      dir="ltr"
+                      className="text-right"
+                    />
+                  </IconField>
+                  <IconField icon={Phone} label="رقم الهاتف">
+                    <Input
+                      type="tel"
+                      value={orgForm.phone}
+                      onChange={(e) => handleOrgFormChange("phone", e.target.value)}
+                      placeholder="05XXXXXXXX"
+                      dir="ltr"
+                      className="text-right"
+                    />
+                  </IconField>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Proceed Button */}
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+            <Button onClick={handleProceedToEvaluation} disabled={saving} className="w-full h-12 gap-2 text-base font-medium shadow-md">
+              {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <ChevronLeft className="w-5 h-5" />}
+              الانتقال لمرحلة التقييم
+            </Button>
+          </motion.div>
         </div>
       </div>
     );
@@ -359,15 +436,19 @@ const PublicEvaluation = () => {
 
 // ─── Helper Components ───
 
-function FormField({
-  label, value, onChange, type = "text", required = false,
+function IconField({
+  icon: Icon, label, required, children,
 }: {
-  label: string; value: string; onChange: (v: string) => void; type?: string; required?: boolean;
+  icon: any; label: string; required?: boolean; children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-2">
-      <Label className="text-sm">{label}{required && " *"}</Label>
-      <Input type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required} />
+    <div className="space-y-1.5">
+      <Label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+        <Icon className="w-3.5 h-3.5" />
+        {label}
+        {required && <span className="text-destructive">*</span>}
+      </Label>
+      {children}
     </div>
   );
 }

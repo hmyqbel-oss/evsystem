@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Building2, MapPin, Phone, Mail, Calendar, Users, Hash, Edit, Trash2, Eye, Search, Loader2 } from "lucide-react";
+import { Plus, Building2, MapPin, Phone, Mail, Briefcase, User, BadgeCheck, Edit, Trash2, Eye, Search, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,9 +14,9 @@ interface DbOrganization {
   name: string;
   city: string;
   region: string;
-  license_number: string;
-  founded_date: string | null;
-  members_count: number;
+  specialty: string;
+  data_entry_name: string;
+  data_entry_role: string;
   email: string;
   phone: string;
 }
@@ -25,16 +25,16 @@ interface OrgFormData {
   name: string;
   city: string;
   region: string;
-  license_number: string;
-  founded_date: string;
-  members_count: number;
+  specialty: string;
+  data_entry_name: string;
+  data_entry_role: string;
   email: string;
   phone: string;
 }
 
 const emptyForm: OrgFormData = {
-  name: "", city: "", region: "", license_number: "",
-  founded_date: "", members_count: 0, email: "", phone: "",
+  name: "", city: "", region: "", specialty: "",
+  data_entry_name: "", data_entry_role: "", email: "", phone: "",
 };
 
 const FormField = ({ label, icon: Icon, children }: { label: string; icon: any; children: React.ReactNode }) => (
@@ -47,13 +47,13 @@ const FormField = ({ label, icon: Icon, children }: { label: string; icon: any; 
   </div>
 );
 
-const InfoRow = ({ icon: Icon, label, value }: { icon: any; label: string; value: string | number }) => (
+const InfoRow = ({ icon: Icon, label, value }: { icon: any; label: string; value: string }) => (
   <div className="flex items-center justify-between py-2.5 border-b border-border/50 last:border-0">
     <span className="text-sm text-muted-foreground flex items-center gap-2">
       <Icon className="w-4 h-4" />
       {label}
     </span>
-    <span className="text-sm font-medium text-foreground" dir={typeof value === 'number' ? 'ltr' : undefined}>{value}</span>
+    <span className="text-sm font-medium text-foreground">{value || "—"}</span>
   </div>
 );
 
@@ -70,14 +70,13 @@ const OrganizationsPage = () => {
   const fetchOrganizations = useCallback(async () => {
     const { data, error } = await supabase
       .from("organizations")
-      .select("*")
+      .select("id, name, city, region, specialty, data_entry_name, data_entry_role, email, phone")
       .order("created_at", { ascending: false });
 
     if (error) {
       toast.error("خطأ في تحميل الجمعيات");
-      console.error(error);
     } else {
-      setOrganizations(data || []);
+      setOrganizations((data as any) || []);
     }
     setLoading(false);
   }, []);
@@ -90,48 +89,25 @@ const OrganizationsPage = () => {
     if (!formData.name) { toast.error("يرجى إدخال اسم الجمعية"); return; }
     setSaving(true);
 
+    const payload = {
+      name: formData.name,
+      city: formData.city,
+      region: formData.region,
+      specialty: formData.specialty,
+      data_entry_name: formData.data_entry_name,
+      data_entry_role: formData.data_entry_role,
+      email: formData.email,
+      phone: formData.phone,
+    };
+
     if (editOrg) {
-      const { error } = await supabase
-        .from("organizations")
-        .update({
-          name: formData.name,
-          city: formData.city,
-          region: formData.region,
-          license_number: formData.license_number,
-          founded_date: formData.founded_date || null,
-          members_count: formData.members_count,
-          email: formData.email,
-          phone: formData.phone,
-        })
-        .eq("id", editOrg.id);
-
-      if (error) {
-        toast.error("خطأ في تحديث البيانات");
-        console.error(error);
-      } else {
-        toast.success("تم تحديث بيانات الجمعية بنجاح");
-        setEditOrg(null);
-      }
+      const { error } = await supabase.from("organizations").update(payload).eq("id", editOrg.id);
+      if (error) toast.error("خطأ في تحديث البيانات");
+      else { toast.success("تم تحديث بيانات الجمعية بنجاح"); setEditOrg(null); }
     } else {
-      const { error } = await supabase
-        .from("organizations")
-        .insert({
-          name: formData.name,
-          city: formData.city,
-          region: formData.region,
-          license_number: formData.license_number,
-          founded_date: formData.founded_date || null,
-          members_count: formData.members_count,
-          email: formData.email,
-          phone: formData.phone,
-        });
-
-      if (error) {
-        toast.error("خطأ في إضافة الجمعية");
-        console.error(error);
-      } else {
-        toast.success("تمت إضافة الجمعية بنجاح");
-      }
+      const { error } = await supabase.from("organizations").insert(payload);
+      if (error) toast.error("خطأ في إضافة الجمعية");
+      else toast.success("تمت إضافة الجمعية بنجاح");
     }
 
     setSaving(false);
@@ -143,27 +119,17 @@ const OrganizationsPage = () => {
   const handleEdit = (org: DbOrganization) => {
     setEditOrg(org);
     setFormData({
-      name: org.name,
-      city: org.city,
-      region: org.region,
-      license_number: org.license_number,
-      founded_date: org.founded_date || "",
-      members_count: org.members_count,
-      email: org.email,
-      phone: org.phone,
+      name: org.name, city: org.city, region: org.region,
+      specialty: org.specialty, data_entry_name: org.data_entry_name,
+      data_entry_role: org.data_entry_role, email: org.email, phone: org.phone,
     });
     setIsOpen(true);
   };
 
   const handleDelete = async (id: string) => {
     const { error } = await supabase.from("organizations").delete().eq("id", id);
-    if (error) {
-      toast.error("خطأ في حذف الجمعية");
-      console.error(error);
-    } else {
-      toast.success("تم حذف الجمعية");
-      fetchOrganizations();
-    }
+    if (error) toast.error("خطأ في حذف الجمعية");
+    else { toast.success("تم حذف الجمعية"); fetchOrganizations(); }
   };
 
   const filtered = organizations.filter(o =>
@@ -175,42 +141,40 @@ const OrganizationsPage = () => {
       <div>
         <div className="flex items-center gap-2 mb-4">
           <div className="w-1 h-5 rounded-full bg-primary" />
-          <h3 className="font-semibold text-foreground">البيانات الأساسية</h3>
+          <h3 className="font-semibold text-foreground">معلومات الجمعية</h3>
         </div>
         <div className="space-y-4">
+          <FormField label="اسم الجمعية" icon={Building2}>
+            <Input value={formData.name} onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))} placeholder="أدخل اسم الجمعية" />
+          </FormField>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormField label="اسم الجمعية" icon={Building2}>
-              <Input value={formData.name} onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))} placeholder="أدخل اسم الجمعية" />
-            </FormField>
-            <FormField label="رقم الترخيص" icon={Hash}>
-              <Input value={formData.license_number} onChange={e => setFormData(prev => ({ ...prev, license_number: e.target.value }))} placeholder="مثال: 1234" dir="ltr" className="text-right" />
-            </FormField>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormField label="المدينة" icon={MapPin}>
-              <Input value={formData.city} onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))} placeholder="مثال: الرياض" />
-            </FormField>
             <FormField label="المنطقة" icon={MapPin}>
               <Input value={formData.region} onChange={e => setFormData(prev => ({ ...prev, region: e.target.value }))} placeholder="مثال: منطقة الرياض" />
             </FormField>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormField label="تاريخ التأسيس" icon={Calendar}>
-              <Input type="date" value={formData.founded_date} onChange={e => setFormData(prev => ({ ...prev, founded_date: e.target.value }))} dir="ltr" className="text-right" />
-            </FormField>
-            <FormField label="عدد الأعضاء" icon={Users}>
-              <Input type="number" value={formData.members_count || ""} onChange={e => setFormData(prev => ({ ...prev, members_count: parseInt(e.target.value) || 0 }))} placeholder="0" dir="ltr" className="text-right" />
+            <FormField label="المدينة" icon={MapPin}>
+              <Input value={formData.city} onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))} placeholder="مثال: الرياض" />
             </FormField>
           </div>
+          <FormField label="مجال التخصص" icon={Briefcase}>
+            <Input value={formData.specialty} onChange={e => setFormData(prev => ({ ...prev, specialty: e.target.value }))} placeholder="مثال: التنمية المجتمعية" />
+          </FormField>
         </div>
       </div>
 
       <div>
         <div className="flex items-center gap-2 mb-4">
           <div className="w-1 h-5 rounded-full bg-accent" />
-          <h3 className="font-semibold text-foreground">بيانات التواصل</h3>
+          <h3 className="font-semibold text-foreground">بيانات مدخل البيانات والتواصل</h3>
         </div>
         <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormField label="اسم مدخل البيانات" icon={User}>
+              <Input value={formData.data_entry_name} onChange={e => setFormData(prev => ({ ...prev, data_entry_name: e.target.value }))} placeholder="الاسم الكامل" />
+            </FormField>
+            <FormField label="صفته في الجمعية" icon={BadgeCheck}>
+              <Input value={formData.data_entry_role} onChange={e => setFormData(prev => ({ ...prev, data_entry_role: e.target.value }))} placeholder="مثال: مدير تنفيذي" />
+            </FormField>
+          </div>
           <FormField label="البريد الإلكتروني" icon={Mail}>
             <Input type="email" value={formData.email} onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))} placeholder="example@org.sa" dir="ltr" className="text-right" />
           </FormField>
@@ -262,12 +226,11 @@ const OrganizationsPage = () => {
         <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="ابحث عن جمعية..." className="pr-10" />
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         {[
           { label: "إجمالي الجمعيات", value: organizations.length },
-          { label: "إجمالي الأعضاء", value: organizations.reduce((s, o) => s + o.members_count, 0) },
-          { label: "المدن", value: new Set(organizations.map(o => o.city)).size },
-          { label: "المناطق", value: new Set(organizations.map(o => o.region)).size },
+          { label: "المدن", value: new Set(organizations.map(o => o.city).filter(Boolean)).size },
+          { label: "المناطق", value: new Set(organizations.map(o => o.region).filter(Boolean)).size },
         ].map(s => (
           <Card key={s.label} className="border-0 shadow-sm">
             <CardContent className="p-4 text-center">
@@ -291,7 +254,7 @@ const OrganizationsPage = () => {
                       </div>
                       <div>
                         <h3 className="font-semibold text-foreground leading-tight">{org.name}</h3>
-                        <Badge variant="secondary" className="mt-1 text-[10px] font-normal">ترخيص: {org.license_number}</Badge>
+                        {org.specialty && <Badge variant="secondary" className="mt-1 text-[10px] font-normal">{org.specialty}</Badge>}
                       </div>
                     </div>
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -301,10 +264,9 @@ const OrganizationsPage = () => {
                     </div>
                   </div>
                   <div className="space-y-2 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2"><MapPin className="w-4 h-4 flex-shrink-0" /><span>{org.city} — {org.region}</span></div>
-                    <div className="flex items-center gap-2"><Users className="w-4 h-4 flex-shrink-0" /><span>{org.members_count} عضو</span></div>
-                    <div className="flex items-center gap-2"><Mail className="w-4 h-4 flex-shrink-0" /><span dir="ltr" className="text-xs truncate">{org.email}</span></div>
-                    <div className="flex items-center gap-2"><Phone className="w-4 h-4 flex-shrink-0" /><span dir="ltr">{org.phone}</span></div>
+                    <div className="flex items-center gap-2"><MapPin className="w-4 h-4 flex-shrink-0" /><span>{org.city || "—"} — {org.region || "—"}</span></div>
+                    <div className="flex items-center gap-2"><User className="w-4 h-4 flex-shrink-0" /><span>{org.data_entry_name || "—"}</span></div>
+                    <div className="flex items-center gap-2"><Mail className="w-4 h-4 flex-shrink-0" /><span dir="ltr" className="text-xs truncate">{org.email || "—"}</span></div>
                   </div>
                 </CardContent>
               </Card>
@@ -335,15 +297,21 @@ const OrganizationsPage = () => {
                   <Building2 className="w-8 h-8 text-primary" />
                 </div>
                 <h2 className="text-lg font-bold text-foreground">{viewOrg.name}</h2>
-                <Badge variant="outline" className="mt-2">ترخيص رقم: {viewOrg.license_number}</Badge>
+                {viewOrg.specialty && <Badge variant="outline" className="mt-2">{viewOrg.specialty}</Badge>}
               </div>
               <div>
                 <p className="text-xs font-medium text-muted-foreground mb-2">البيانات الأساسية</p>
                 <div className="bg-muted/30 rounded-lg px-4">
-                  <InfoRow icon={MapPin} label="المدينة" value={viewOrg.city} />
                   <InfoRow icon={MapPin} label="المنطقة" value={viewOrg.region} />
-                  <InfoRow icon={Calendar} label="تاريخ التأسيس" value={viewOrg.founded_date || "—"} />
-                  <InfoRow icon={Users} label="عدد الأعضاء" value={viewOrg.members_count} />
+                  <InfoRow icon={MapPin} label="المدينة" value={viewOrg.city} />
+                  <InfoRow icon={Briefcase} label="التخصص" value={viewOrg.specialty} />
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-2">مدخل البيانات</p>
+                <div className="bg-muted/30 rounded-lg px-4">
+                  <InfoRow icon={User} label="الاسم" value={viewOrg.data_entry_name} />
+                  <InfoRow icon={BadgeCheck} label="الصفة" value={viewOrg.data_entry_role} />
                 </div>
               </div>
               <div>

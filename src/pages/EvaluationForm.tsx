@@ -20,7 +20,7 @@ const EvaluationForm = () => {
   const { id: editId } = useParams<{ id: string }>();
   const { user } = useAuth();
 
-  const [orgs, setOrgs] = useState<{ id: string; name: string; city: string; region: string; license_number: string; members_count: number }[]>([]);
+  const [orgs, setOrgs] = useState<{ id: string; name: string; city: string; region: string }[]>([]);
   const [selectedOrgId, setSelectedOrgId] = useState<string>("");
   const [currentSection, setCurrentSection] = useState(0);
   const [scores, setScores] = useState<Record<number, number>>({});
@@ -32,12 +32,11 @@ const EvaluationForm = () => {
   const progressPct = Math.round((answeredCount / totalQuestions) * 100);
 
   useEffect(() => {
-    supabase.from("organizations").select("id, name, city, region, license_number, members_count").then(({ data }) => {
+    supabase.from("organizations").select("id, name, city, region").then(({ data }) => {
       if (data) setOrgs(data);
     });
   }, []);
 
-  // Load existing evaluation if editing
   useEffect(() => {
     if (!editId) return;
     supabase.from("evaluations").select("*").eq("id", editId).single().then(({ data }) => {
@@ -62,28 +61,15 @@ const EvaluationForm = () => {
   };
 
   const saveToDb = async (status: "draft" | "submitted") => {
-    if (!selectedOrgId) {
-      toast.error("يرجى اختيار الجمعية أولاً");
-      return false;
-    }
-    if (!user) {
-      toast.error("يجب تسجيل الدخول أولاً");
-      return false;
-    }
+    if (!selectedOrgId) { toast.error("يرجى اختيار الجمعية أولاً"); return false; }
+    if (!user) { toast.error("يجب تسجيل الدخول أولاً"); return false; }
     if (status === "submitted" && answeredCount < totalQuestions) {
       toast.error(`يرجى الإجابة على جميع الأسئلة (${answeredCount}/${totalQuestions})`);
       return false;
     }
-
     setSaving(true);
     try {
-      const payload = {
-        organization_id: selectedOrgId,
-        evaluator_id: user.id,
-        scores: scores as any,
-        status,
-      };
-
+      const payload = { organization_id: selectedOrgId, evaluator_id: user.id, scores: scores as any, status };
       if (evaluationId) {
         const { error } = await supabase.from("evaluations").update(payload).eq("id", evaluationId);
         if (error) throw error;
@@ -96,30 +82,16 @@ const EvaluationForm = () => {
     } catch (err: any) {
       toast.error("حدث خطأ أثناء الحفظ: " + (err.message || ""));
       return false;
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   };
 
-  const handleSaveDraft = async () => {
-    const ok = await saveToDb("draft");
-    if (ok) toast.success("تم حفظ المسودة بنجاح");
-  };
-
-  const handleSubmit = async () => {
-    const ok = await saveToDb("submitted");
-    if (ok) {
-      toast.success("تم إرسال التقييم بنجاح");
-      navigate("/evaluations");
-    }
-  };
+  const handleSaveDraft = async () => { const ok = await saveToDb("draft"); if (ok) toast.success("تم حفظ المسودة بنجاح"); };
+  const handleSubmit = async () => { const ok = await saveToDb("submitted"); if (ok) { toast.success("تم إرسال التقييم بنجاح"); navigate("/evaluations"); } };
 
   return (
     <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
       <div className="space-y-4">
         <h1 className="text-2xl font-bold text-foreground">{editId ? "تعديل التقييم" : "نموذج التقييم"}</h1>
-
-        {/* Organization Selector */}
         <Card className="border shadow-sm">
           <CardContent className="p-4 space-y-3">
             <div className="flex items-center gap-2">
@@ -143,11 +115,7 @@ const EvaluationForm = () => {
             </Select>
             {selectedOrg && (
               <div className="flex items-center gap-4 text-xs text-muted-foreground bg-muted/50 rounded-lg p-3">
-                <span>ترخيص: {selectedOrg.license_number}</span>
-                <span>•</span>
                 <span>{selectedOrg.city} — {selectedOrg.region}</span>
-                <span>•</span>
-                <span>{selectedOrg.members_count} عضو</span>
               </div>
             )}
             {!selectedOrgId && (
@@ -159,7 +127,6 @@ const EvaluationForm = () => {
           </CardContent>
         </Card>
 
-        {/* Progress */}
         <Card className="border-0 shadow-sm bg-card">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
@@ -172,57 +139,36 @@ const EvaluationForm = () => {
         </Card>
       </div>
 
-      {/* Section Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-2">
         {sections.map((s, i) => {
           const sAnswered = s.questions.filter((q) => scores[q.id]).length;
           const isComplete = sAnswered === s.questions.length;
           return (
-            <button
-              key={s.name}
-              onClick={() => setCurrentSection(i)}
+            <button key={s.name} onClick={() => setCurrentSection(i)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                i === currentSection
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "bg-card text-muted-foreground hover:bg-secondary"
-              }`}
-            >
+                i === currentSection ? "bg-primary text-primary-foreground shadow-md" : "bg-card text-muted-foreground hover:bg-secondary"
+              }`}>
               {isComplete && <CheckCircle2 className="w-4 h-4" />}
               {s.name}
               <span className={`text-xs px-1.5 py-0.5 rounded-full ${
                 i === currentSection ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"
-              }`}>
-                {sAnswered}/{s.questions.length}
-              </span>
+              }`}>{sAnswered}/{s.questions.length}</span>
             </button>
           );
         })}
       </div>
 
-      {/* Questions */}
       <AnimatePresence mode="wait">
-        <motion.div
-          key={currentSection}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }}
-          className="space-y-4"
-        >
+        <motion.div key={currentSection} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-4">
           {section.questions.map((q) => (
             <Card key={q.id} className="border shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-5">
                 <div className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold">
-                    {q.id}
-                  </span>
+                  <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold">{q.id}</span>
                   <div className="flex-1 space-y-3">
                     <p className="text-sm font-medium leading-relaxed text-foreground">{q.questionText}</p>
                     <p className="text-xs text-muted-foreground">الأدلة المطلوبة: {q.evidence}</p>
-                    <RatingInput
-                      value={scores[q.id] || 0}
-                      onChange={(val) => handleScore(q.id, val)}
-                    />
+                    <RatingInput value={scores[q.id] || 0} onChange={(val) => handleScore(q.id, val)} />
                   </div>
                 </div>
               </CardContent>
@@ -231,52 +177,33 @@ const EvaluationForm = () => {
         </motion.div>
       </AnimatePresence>
 
-      {/* Navigation */}
       <div className="flex items-center justify-between pt-4">
-        <Button
-          variant="outline"
-          onClick={() => setCurrentSection(Math.max(0, currentSection - 1))}
-          disabled={currentSection === 0}
-          className="gap-2"
-        >
-          <ChevronRight className="w-4 h-4" />
-          السابق
+        <Button variant="outline" onClick={() => setCurrentSection(Math.max(0, currentSection - 1))} disabled={currentSection === 0} className="gap-2">
+          <ChevronRight className="w-4 h-4" /> السابق
         </Button>
-
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleSaveDraft} disabled={saving} className="gap-2">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            حفظ مسودة
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} حفظ مسودة
           </Button>
           {currentSection === sections.length - 1 ? (
             <Button onClick={handleSubmit} disabled={saving} className="gap-2">
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-              إرسال التقييم
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />} إرسال التقييم
             </Button>
           ) : (
-            <Button
-              onClick={() => setCurrentSection(Math.min(sections.length - 1, currentSection + 1))}
-              className="gap-2"
-            >
-              التالي
-              <ChevronLeft className="w-4 h-4" />
+            <Button onClick={() => setCurrentSection(Math.min(sections.length - 1, currentSection + 1))} className="gap-2">
+              التالي <ChevronLeft className="w-4 h-4" />
             </Button>
           )}
         </div>
       </div>
 
-      {/* Score Preview */}
       {answeredCount > 0 && (
         <Card className="border-0 bg-card shadow-sm">
           <CardContent className="p-4 flex items-center justify-between">
             <span className="text-sm text-muted-foreground">النتيجة الحالية</span>
             <div className="flex items-center gap-3">
-              <span className={`text-2xl font-bold ${getScoreColor(getOverallScore(scores))}`}>
-                {getOverallScore(scores)}%
-              </span>
-              <span className={`text-sm font-medium ${getScoreColor(getOverallScore(scores))}`}>
-                {getScoreLabel(getOverallScore(scores))}
-              </span>
+              <span className={`text-2xl font-bold ${getScoreColor(getOverallScore(scores))}`}>{getOverallScore(scores)}%</span>
+              <span className={`text-sm font-medium ${getScoreColor(getOverallScore(scores))}`}>{getScoreLabel(getOverallScore(scores))}</span>
             </div>
           </CardContent>
         </Card>
