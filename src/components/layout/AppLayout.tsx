@@ -20,6 +20,7 @@ import { ReactNode } from "react";
 const adminLinks = [
   { title: "لوحة التحكم", url: "/dashboard", icon: LayoutDashboard },
   { title: "المنظمات", url: "/organizations", icon: Building2 },
+  { title: "المستخدمون", url: "/users", icon: Users },
   { title: "النتائج", url: "/results", icon: FileBarChart },
 ];
 
