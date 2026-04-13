@@ -71,7 +71,7 @@ const OrganizationsPage = () => {
     </div>
   );
 
-  const OrgForm = () => (
+  const orgForm = (
     <div className="space-y-6">
       {/* القسم: البيانات الأساسية */}
       <div>
@@ -82,26 +82,26 @@ const OrganizationsPage = () => {
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField label="اسم الجمعية" icon={Building2}>
-              <Input value={formData.name || ""} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="أدخل اسم الجمعية" />
+              <Input value={formData.name || ""} onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))} placeholder="أدخل اسم الجمعية" />
             </FormField>
             <FormField label="رقم الترخيص" icon={Hash}>
-              <Input value={formData.licenseNumber || ""} onChange={e => setFormData({ ...formData, licenseNumber: e.target.value })} placeholder="مثال: 1234" dir="ltr" className="text-right" />
+              <Input value={formData.licenseNumber || ""} onChange={e => setFormData(prev => ({ ...prev, licenseNumber: e.target.value }))} placeholder="مثال: 1234" dir="ltr" className="text-right" />
             </FormField>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField label="المدينة" icon={MapPin}>
-              <Input value={formData.city || ""} onChange={e => setFormData({ ...formData, city: e.target.value })} placeholder="مثال: الرياض" />
+              <Input value={formData.city || ""} onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))} placeholder="مثال: الرياض" />
             </FormField>
             <FormField label="المنطقة" icon={MapPin}>
-              <Input value={formData.region || ""} onChange={e => setFormData({ ...formData, region: e.target.value })} placeholder="مثال: منطقة الرياض" />
+              <Input value={formData.region || ""} onChange={e => setFormData(prev => ({ ...prev, region: e.target.value }))} placeholder="مثال: منطقة الرياض" />
             </FormField>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField label="تاريخ التأسيس" icon={Calendar}>
-              <Input type="date" value={formData.foundedDate || ""} onChange={e => setFormData({ ...formData, foundedDate: e.target.value })} dir="ltr" className="text-right" />
+              <Input type="date" value={formData.foundedDate || ""} onChange={e => setFormData(prev => ({ ...prev, foundedDate: e.target.value }))} dir="ltr" className="text-right" />
             </FormField>
             <FormField label="عدد الأعضاء" icon={Users}>
-              <Input type="number" value={formData.membersCount || ""} onChange={e => setFormData({ ...formData, membersCount: parseInt(e.target.value) || 0 })} placeholder="0" dir="ltr" className="text-right" />
+              <Input type="number" value={formData.membersCount || ""} onChange={e => setFormData(prev => ({ ...prev, membersCount: parseInt(e.target.value) || 0 }))} placeholder="0" dir="ltr" className="text-right" />
             </FormField>
           </div>
         </div>
@@ -115,10 +115,10 @@ const OrganizationsPage = () => {
         </div>
         <div className="space-y-4">
           <FormField label="البريد الإلكتروني" icon={Mail}>
-            <Input type="email" value={formData.email || ""} onChange={e => setFormData({ ...formData, email: e.target.value })} placeholder="example@org.sa" dir="ltr" className="text-right" />
+            <Input type="email" value={formData.email || ""} onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))} placeholder="example@org.sa" dir="ltr" className="text-right" />
           </FormField>
           <FormField label="رقم الجوال" icon={Phone}>
-            <Input value={formData.phone || ""} onChange={e => setFormData({ ...formData, phone: e.target.value })} placeholder="05XXXXXXXX" dir="ltr" className="text-right" />
+            <Input value={formData.phone || ""} onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))} placeholder="05XXXXXXXX" dir="ltr" className="text-right" />
           </FormField>
         </div>
       </div>
