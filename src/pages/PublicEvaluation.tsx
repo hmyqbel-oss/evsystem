@@ -125,7 +125,17 @@ const PublicEvaluation = () => {
   if (step === "thank-you") {
     const score = getOverallScore(scores);
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background">
+        <div className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50">
+          <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-foreground">منصة التقييم الذاتي</h2>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/login")} className="gap-2 text-muted-foreground">
+              <LogIn className="w-4 h-4" />
+              تسجيل الدخول
+            </Button>
+          </div>
+        </div>
+        <div className="flex items-center justify-center p-4" style={{ minHeight: "calc(100vh - 57px)" }}>
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -151,7 +161,8 @@ const PublicEvaluation = () => {
           </p>
         </motion.div>
       </div>
-    );
+      </div>
+      </div>
   }
 
   // ─── STEP: Organization Info ───
