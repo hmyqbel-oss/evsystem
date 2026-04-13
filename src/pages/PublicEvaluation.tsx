@@ -353,24 +353,29 @@ const PublicEvaluation = () => {
           </CardContent>
         </Card>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="bg-card rounded-xl shadow-sm border p-1.5 flex items-center gap-1">
           {sections.map((s, i) => {
             const sAnswered = s.questions.filter((q) => scores[q.id]).length;
             const isComplete = sAnswered === s.questions.length;
+            const isActive = i === currentSection;
             return (
               <button
                 key={s.name}
                 onClick={() => setCurrentSection(i)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
-                  i === currentSection
+                className={`relative flex-1 flex flex-col items-center gap-1 px-2 py-2.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                  isActive
                     ? "bg-primary text-primary-foreground shadow-md"
-                    : "bg-card text-muted-foreground hover:bg-secondary"
+                    : "text-muted-foreground hover:bg-muted/50"
                 }`}
               >
-                {isComplete && <CheckCircle2 className="w-3.5 h-3.5" />}
-                <span className="truncate max-w-[120px] sm:max-w-none">{s.name}</span>
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                  i === currentSection ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"
+                {isComplete && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-success rounded-full flex items-center justify-center">
+                    <CheckCircle2 className="w-3 h-3 text-success-foreground" />
+                  </span>
+                )}
+                <span className="truncate w-full text-center leading-tight" style={{ fontSize: '11px' }}>{s.name}</span>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                  isActive ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"
                 }`}>
                   {sAnswered}/{s.questions.length}
                 </span>
