@@ -26,11 +26,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function AppRoutes() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, role } = useAuth();
   const loginElement = isLoading
     ? <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin" /></div>
     : isAuthenticated
-      ? <Navigate to="/dashboard" replace />
+      ? role === "admin"
+        ? <Navigate to="/dashboard" replace />
+        : <Navigate to="/" replace />
       : <LoginPage />;
 
   return (

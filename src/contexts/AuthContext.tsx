@@ -63,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         if (!mounted) return;
+        setIsLoading(true);
         if (session?.user) {
           setUser(session.user);
           await fetchUserProfile(session.user.id);
@@ -74,22 +75,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (mounted) setIsLoading(false);
       }
     );
-
-    // 3. Safety timeout — never stay loading forever
-    const timer = setTimeout(() => {
-      if (mounted) setIsLoading(false);
-    }, 5000);
-
-    return () => {
-      mounted = false;
-      clearTimeout(timer);
-      subscription.unsubscribe();
-    };
-  }, [fetchUserProfile]);
-
+...
   const login = async (email: string, password: string) => {
+    setIsLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return { error: error.message };
+    if (error) {
+      setIsLoading(false);
+      return { error: error.message };
+    }
     return {};
   };
 
