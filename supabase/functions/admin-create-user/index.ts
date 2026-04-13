@@ -129,10 +129,20 @@ Deno.serve(async (req) => {
     if (action === "list") {
       const { data: profiles } = await adminClient
         .from("profiles")
-        .select("*, user_roles(role)")
+        .select("*")
         .order("created_at", { ascending: false });
 
-      return new Response(JSON.stringify({ users: profiles }), {
+      const { data: roles } = await adminClient
+        .from("user_roles")
+        .select("user_id, role");
+
+      const rolesMap = new Map((roles || []).map((r: any) => [r.user_id, r.role]));
+      const users = (profiles || []).map((p: any) => ({
+        ...p,
+        user_roles: [{ role: rolesMap.get(p.user_id) || "evaluator" }],
+      }));
+
+      return new Response(JSON.stringify({ users }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
