@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["'Readex Pro'", "sans-serif"],
+        sans: ["Readex Pro", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
