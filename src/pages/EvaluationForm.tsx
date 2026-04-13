@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { sections } from "@/data/assessmentQuestions";
-import { sampleOrganizations } from "@/data/sampleData";
 import { getOverallScore, getScoreLabel, getScoreColor } from "@/data/sampleData";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
