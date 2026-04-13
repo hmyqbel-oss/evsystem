@@ -139,7 +139,7 @@ const PublicEvaluation = () => {
 
   const handleProceedToEvaluation = async () => {
     const ok = await saveOrgData();
-    if (ok) setStep("evaluation");
+    if (ok) { setStep("evaluation"); window.scrollTo(0, 0); }
   };
 
   const section = sections[currentSection];
@@ -388,7 +388,7 @@ const PublicEvaluation = () => {
             return (
               <motion.button
                 key={s.name}
-                onClick={() => setCurrentSection(i)}
+                onClick={() => { setCurrentSection(i); window.scrollTo(0, 0); }}
                 whileTap={{ scale: 0.95 }}
                 className={`relative flex-1 min-w-[80px] flex flex-col items-center gap-1 px-2 py-2.5 rounded-lg text-xs font-medium transition-colors duration-200 ${
                   isActive
@@ -453,7 +453,7 @@ const PublicEvaluation = () => {
               </Button>
             )}
             {currentSection > 0 && (
-              <Button variant="outline" onClick={() => setCurrentSection(currentSection - 1)} className="gap-2 flex-1 sm:flex-none text-xs sm:text-sm">
+              <Button variant="outline" onClick={() => { setCurrentSection(currentSection - 1); window.scrollTo(0, 0); }} className="gap-2 flex-1 sm:flex-none text-xs sm:text-sm">
                 <ChevronRight className="w-4 h-4" />
                 السابق
               </Button>
@@ -470,7 +470,7 @@ const PublicEvaluation = () => {
                 إرسال التقييم
               </Button>
             ) : (
-              <Button onClick={() => setCurrentSection(currentSection + 1)} className="gap-2 flex-1 sm:flex-none text-xs sm:text-sm">
+              <Button onClick={() => { setCurrentSection(currentSection + 1); window.scrollTo(0, 0); }} className="gap-2 flex-1 sm:flex-none text-xs sm:text-sm">
                 التالي
                 <ChevronLeft className="w-4 h-4" />
               </Button>
