@@ -27,8 +27,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function AppRoutes() {
   const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin" /></div>;
+  const loginElement = isLoading
+    ? <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin" /></div>
+    : isAuthenticated
+      ? <Navigate to="/dashboard" replace />
+      : <LoginPage />;
 
   return (
     <Routes>
@@ -37,7 +40,7 @@ function AppRoutes() {
       <Route path="/public-evaluation" element={<Navigate to="/" replace />} />
 
       {/* Admin routes */}
-      <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+      <Route path="/login" element={loginElement} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/evaluations" element={<ProtectedRoute><EvaluationsListPage /></ProtectedRoute>} />
       <Route path="/organizations" element={<ProtectedRoute><OrganizationsPage /></ProtectedRoute>} />
