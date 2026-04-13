@@ -75,7 +75,7 @@ const EvaluationForm = () => {
                 <SelectValue placeholder="اختر الجمعية..." />
               </SelectTrigger>
               <SelectContent>
-                {sampleOrganizations.map((org) => (
+                {orgs.map((org) => (
                   <SelectItem key={org.id} value={org.id}>
                     <div className="flex items-center gap-2">
                       <span>{org.name}</span>
@@ -87,11 +87,11 @@ const EvaluationForm = () => {
             </Select>
             {selectedOrg && (
               <div className="flex items-center gap-4 text-xs text-muted-foreground bg-muted/50 rounded-lg p-3">
-                <span>ترخيص: {selectedOrg.licenseNumber}</span>
+                <span>ترخيص: {selectedOrg.license_number}</span>
                 <span>•</span>
                 <span>{selectedOrg.city} — {selectedOrg.region}</span>
                 <span>•</span>
-                <span>{selectedOrg.membersCount} عضو</span>
+                <span>{selectedOrg.members_count} عضو</span>
               </div>
             )}
             {!selectedOrgId && (
