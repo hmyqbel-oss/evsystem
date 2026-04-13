@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      organizations: {
+        Row: {
+          city: string
+          created_at: string
+          email: string
+          founded_date: string | null
+          id: string
+          license_number: string
+          members_count: number
+          name: string
+          phone: string
+          region: string
+          updated_at: string
+        }
+        Insert: {
+          city?: string
+          created_at?: string
+          email?: string
+          founded_date?: string | null
+          id?: string
+          license_number?: string
+          members_count?: number
+          name: string
+          phone?: string
+          region?: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          email?: string
+          founded_date?: string | null
+          id?: string
+          license_number?: string
+          members_count?: number
+          name?: string
+          phone?: string
+          region?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
