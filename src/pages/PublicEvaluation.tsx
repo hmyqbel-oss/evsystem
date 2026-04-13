@@ -54,39 +54,52 @@ const PublicEvaluation = () => {
     setOrgForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleProceedToEvaluation = async () => {
+  const saveOrgData = async (): Promise<boolean> => {
     if (!orgForm.name.trim()) {
       toast.error("يرجى إدخال اسم الجمعية");
-      return;
+      return false;
     }
     if (!orgForm.data_entry_name.trim()) {
       toast.error("يرجى إدخال اسم مدخل البيانات");
-      return;
+      return false;
     }
     setSaving(true);
     try {
-      const { data, error } = await supabase
-        .from("organizations")
-        .insert({
-          name: orgForm.name,
-          city: orgForm.city,
-          region: orgForm.region,
-          specialty: orgForm.specialty,
-          data_entry_name: orgForm.data_entry_name,
-          data_entry_role: orgForm.data_entry_role,
-          email: orgForm.email,
-          phone: orgForm.phone,
-        })
-        .select("id")
-        .single();
-      if (error) throw error;
-      setOrgId(data.id);
-      setStep("evaluation");
+      const payload = {
+        name: orgForm.name,
+        city: orgForm.city,
+        region: orgForm.region,
+        specialty: orgForm.specialty,
+        data_entry_name: orgForm.data_entry_name,
+        data_entry_role: orgForm.data_entry_role,
+        email: orgForm.email,
+        phone: orgForm.phone,
+      };
+      if (orgId) {
+        const { error } = await supabase.from("organizations").update(payload).eq("id", orgId);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase.from("organizations").insert(payload).select("id").single();
+        if (error) throw error;
+        setOrgId(data.id);
+      }
+      return true;
     } catch (err: any) {
       toast.error("حدث خطأ: " + (err.message || ""));
+      return false;
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSaveOrgOnly = async () => {
+    const ok = await saveOrgData();
+    if (ok) toast.success("تم حفظ بيانات الجمعية بنجاح");
+  };
+
+  const handleProceedToEvaluation = async () => {
+    const ok = await saveOrgData();
+    if (ok) setStep("evaluation");
   };
 
   const section = sections[currentSection];
@@ -289,10 +302,14 @@ const PublicEvaluation = () => {
           </motion.div>
 
           {/* Proceed Button */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <Button onClick={handleProceedToEvaluation} disabled={saving} className="w-full h-12 gap-2 text-base font-medium shadow-md">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="flex flex-col sm:flex-row gap-3">
+            <Button variant="outline" onClick={handleSaveOrgOnly} disabled={saving} className="flex-1 h-12 gap-2 text-base font-medium">
+              {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+              حفظ بيانات الجمعية
+            </Button>
+            <Button onClick={handleProceedToEvaluation} disabled={saving} className="flex-1 h-12 gap-2 text-base font-medium shadow-md">
               {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <ChevronLeft className="w-5 h-5" />}
-              الانتقال لمرحلة التقييم
+              الانتقال للتقييم
             </Button>
           </motion.div>
         </div>
