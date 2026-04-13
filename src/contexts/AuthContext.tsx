@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from "react";
+import { useState, useEffect, createContext, useContext, ReactNode, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
@@ -32,19 +32,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userName, setUserName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchUserProfile = async (userId: string) => {
-    const [{ data: profile }, { data: roleData }] = await Promise.all([
-      supabase.from("profiles").select("full_name").eq("user_id", userId).single(),
-      supabase.from("user_roles").select("role").eq("user_id", userId).single(),
-    ]);
-
-    setUserName(profile?.full_name || "");
-    setRole((roleData?.role as UserRole) || "evaluator");
-  };
+  const fetchUserProfile = useCallback(async (userId: string) => {
+    try {
+      const [{ data: profile }, { data: roleData }] = await Promise.all([
+        supabase.from("profiles").select("full_name").eq("user_id", userId).single(),
+        supabase.from("user_roles").select("role").eq("user_id", userId).single(),
+      ]);
+      setUserName(profile?.full_name || "");
+      setRole((roleData?.role as UserRole) || "evaluator");
+    } catch {
+      setRole(null);
+      setUserName("");
+    }
+  }, []);
 
   useEffect(() => {
+    let mounted = true;
+
+    // 1. Get initial session
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!mounted) return;
+      if (session?.user) {
+        setUser(session.user);
+        await fetchUserProfile(session.user.id);
+      }
+      if (mounted) setIsLoading(false);
+    });
+
+    // 2. Listen for future changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        if (!mounted) return;
         if (session?.user) {
           setUser(session.user);
           await fetchUserProfile(session.user.id);
@@ -53,20 +71,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setRole(null);
           setUserName("");
         }
-        setIsLoading(false);
+        if (mounted) setIsLoading(false);
       }
     );
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        setUser(session.user);
-        await fetchUserProfile(session.user.id);
-      }
-      setIsLoading(false);
-    });
+    // 3. Safety timeout — never stay loading forever
+    const timer = setTimeout(() => {
+      if (mounted) setIsLoading(false);
+    }, 5000);
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      mounted = false;
+      clearTimeout(timer);
+      subscription.unsubscribe();
+    };
+  }, [fetchUserProfile]);
 
   const login = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
