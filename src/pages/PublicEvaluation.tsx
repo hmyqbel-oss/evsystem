@@ -95,7 +95,10 @@ const PublicEvaluation = () => {
 
   const handleSaveOrgOnly = async () => {
     const ok = await saveOrgData();
-    if (ok) toast.success("تم حفظ بيانات الجمعية بنجاح");
+    if (ok) {
+      setOrgSaved(true);
+      toast.success("تم حفظ بيانات الجمعية بنجاح");
+    }
   };
 
   const handleProceedToEvaluation = async () => {
@@ -304,9 +307,14 @@ const PublicEvaluation = () => {
 
           {/* Proceed Button */}
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="flex flex-col sm:flex-row gap-3">
-            <Button variant="outline" onClick={handleSaveOrgOnly} disabled={saving} className="flex-1 h-12 gap-2 text-base font-medium">
-              {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-              حفظ بيانات الجمعية
+            <Button
+              variant={orgSaved ? "outline" : "outline"}
+              onClick={handleSaveOrgOnly}
+              disabled={saving}
+              className={`flex-1 h-12 gap-2 text-base font-medium transition-all ${orgSaved ? "border-success text-success hover:text-success" : ""}`}
+            >
+              {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : orgSaved ? <CheckCircle2 className="w-5 h-5" /> : <Save className="w-5 h-5" />}
+              {orgSaved ? "تم الحفظ بنجاح" : "حفظ بيانات الجمعية"}
             </Button>
             <Button onClick={handleProceedToEvaluation} disabled={saving} className="flex-1 h-12 gap-2 text-base font-medium shadow-md">
               {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <ChevronLeft className="w-5 h-5" />}
