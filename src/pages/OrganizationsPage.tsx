@@ -157,7 +157,7 @@ const OrganizationsPage = () => {
             <DialogHeader>
               <DialogTitle className="text-lg">{editOrg ? "تعديل بيانات الجمعية" : "إضافة جمعية جديدة"}</DialogTitle>
             </DialogHeader>
-            <OrgForm />
+            {orgForm}
           </DialogContent>
         </Dialog>
       </div>
