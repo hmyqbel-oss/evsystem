@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { sections, questions } from "@/data/assessmentQuestions";
-import { getOverallScore, getSectionScore, getScoreLabel, getScoreColor, sectionColors } from "@/data/sampleData";
+import { sections, questions, sectionColors } from "@/data/assessmentQuestions";
+import { getOverallScore, getSectionScore, getScoreLabel, getScoreColor } from "@/data/sampleData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
