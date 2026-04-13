@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { crypto } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { sections } from "@/data/assessmentQuestions";
 import { getOverallScore, getScoreLabel, getScoreColor } from "@/data/sampleData";
