@@ -5,20 +5,29 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { ClipboardCheck, Shield, Users } from "lucide-react";
+import { ClipboardCheck, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [selectedRole, setSelectedRole] = useState<"admin" | "evaluator">("evaluator");
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const name = selectedRole === "admin" ? "مدير النظام" : "أحمد محمد";
-    login(selectedRole, name);
-    navigate(selectedRole === "admin" ? "/dashboard" : "/evaluations");
+    if (!email || !password) {
+      toast({ title: "خطأ", description: "يرجى إدخال البريد الإلكتروني وكلمة المرور", variant: "destructive" });
+      return;
+    }
+    setLoading(true);
+    const result = await login(email, password);
+    setLoading(false);
+    if (result.error) {
+      toast({ title: "خطأ في تسجيل الدخول", description: "البريد الإلكتروني أو كلمة المرور غير صحيحة", variant: "destructive" });
+    }
   };
 
   return (
@@ -42,27 +51,6 @@ const LoginPage = () => {
             <CardTitle className="text-lg text-center">تسجيل الدخول</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-2 mb-6">
-              <Button
-                type="button"
-                variant={selectedRole === "evaluator" ? "default" : "outline"}
-                className="flex-1 gap-2"
-                onClick={() => setSelectedRole("evaluator")}
-              >
-                <Users className="w-4 h-4" />
-                مُقيّم
-              </Button>
-              <Button
-                type="button"
-                variant={selectedRole === "admin" ? "default" : "outline"}
-                className="flex-1 gap-2"
-                onClick={() => setSelectedRole("admin")}
-              >
-                <Shield className="w-4 h-4" />
-                مدير
-              </Button>
-            </div>
-
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">البريد الإلكتروني</label>
@@ -73,6 +61,7 @@ const LoginPage = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   className="text-left"
                   dir="ltr"
+                  required
                 />
               </div>
               <div>
@@ -84,16 +73,14 @@ const LoginPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className="text-left"
                   dir="ltr"
+                  required
                 />
               </div>
-              <Button type="submit" className="w-full" size="lg">
+              <Button type="submit" className="w-full" size="lg" disabled={loading}>
+                {loading ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : null}
                 دخول
               </Button>
             </form>
-
-            <p className="text-xs text-muted-foreground text-center mt-4">
-              نسخة تجريبية — اضغط "دخول" مباشرة
-            </p>
           </CardContent>
         </Card>
       </motion.div>
