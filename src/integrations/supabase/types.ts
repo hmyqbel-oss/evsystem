@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      evaluations: {
+        Row: {
+          created_at: string
+          evaluator_id: string
+          id: string
+          organization_id: string
+          scores: Json
+          status: string
+          updated_at: string
+          visit_number: number
+        }
+        Insert: {
+          created_at?: string
+          evaluator_id: string
+          id?: string
+          organization_id: string
+          scores?: Json
+          status?: string
+          updated_at?: string
+          visit_number?: number
+        }
+        Update: {
+          created_at?: string
+          evaluator_id?: string
+          id?: string
+          organization_id?: string
+          scores?: Json
+          status?: string
+          updated_at?: string
+          visit_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           city: string

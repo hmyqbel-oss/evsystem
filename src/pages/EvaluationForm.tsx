@@ -1,23 +1,32 @@
 import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { sections } from "@/data/assessmentQuestions";
 import { getOverallScore, getScoreLabel, getScoreColor } from "@/data/sampleData";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, ChevronLeft, Save, Send, CheckCircle2, Building2, AlertCircle } from "lucide-react";
+import { ChevronRight, ChevronLeft, Save, Send, CheckCircle2, Building2, AlertCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import RatingInput from "@/components/evaluation/RatingInput";
 
 const EvaluationForm = () => {
+  const navigate = useNavigate();
+  const { id: editId } = useParams<{ id: string }>();
+  const { user } = useAuth();
+
   const [orgs, setOrgs] = useState<{ id: string; name: string; city: string; region: string; license_number: string; members_count: number }[]>([]);
   const [selectedOrgId, setSelectedOrgId] = useState<string>("");
   const [currentSection, setCurrentSection] = useState(0);
   const [scores, setScores] = useState<Record<number, number>>({});
+  const [saving, setSaving] = useState(false);
+  const [evaluationId, setEvaluationId] = useState<string | null>(editId || null);
+
   const totalQuestions = 80;
   const answeredCount = Object.keys(scores).length;
   const progressPct = Math.round((answeredCount / totalQuestions) * 100);
@@ -28,6 +37,23 @@ const EvaluationForm = () => {
     });
   }, []);
 
+  // Load existing evaluation if editing
+  useEffect(() => {
+    if (!editId) return;
+    supabase.from("evaluations").select("*").eq("id", editId).single().then(({ data }) => {
+      if (data) {
+        setSelectedOrgId(data.organization_id);
+        const loadedScores: Record<number, number> = {};
+        if (data.scores && typeof data.scores === "object" && !Array.isArray(data.scores)) {
+          Object.entries(data.scores as Record<string, number>).forEach(([k, v]) => {
+            loadedScores[Number(k)] = v;
+          });
+        }
+        setScores(loadedScores);
+      }
+    });
+  }, [editId]);
+
   const section = sections[currentSection];
   const selectedOrg = orgs.find((o) => o.id === selectedOrgId);
 
@@ -35,33 +61,63 @@ const EvaluationForm = () => {
     setScores((prev) => ({ ...prev, [questionId]: score }));
   };
 
-  const handleSaveDraft = () => {
+  const saveToDb = async (status: "draft" | "submitted") => {
     if (!selectedOrgId) {
       toast.error("يرجى اختيار الجمعية أولاً");
-      return;
+      return false;
     }
-    toast.success("تم حفظ المسودة بنجاح");
-  };
-
-  const handleSubmit = () => {
-    if (!selectedOrgId) {
-      toast.error("يرجى اختيار الجمعية أولاً");
-      return;
+    if (!user) {
+      toast.error("يجب تسجيل الدخول أولاً");
+      return false;
     }
-    if (answeredCount < totalQuestions) {
+    if (status === "submitted" && answeredCount < totalQuestions) {
       toast.error(`يرجى الإجابة على جميع الأسئلة (${answeredCount}/${totalQuestions})`);
-      return;
+      return false;
     }
-    toast.success("تم إرسال التقييم بنجاح");
+
+    setSaving(true);
+    try {
+      const payload = {
+        organization_id: selectedOrgId,
+        evaluator_id: user.id,
+        scores: scores as any,
+        status,
+      };
+
+      if (evaluationId) {
+        const { error } = await supabase.from("evaluations").update(payload).eq("id", evaluationId);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase.from("evaluations").insert(payload).select("id").single();
+        if (error) throw error;
+        if (data) setEvaluationId(data.id);
+      }
+      return true;
+    } catch (err: any) {
+      toast.error("حدث خطأ أثناء الحفظ: " + (err.message || ""));
+      return false;
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const sectionAnswered = section.questions.filter((q) => scores[q.id]).length;
+  const handleSaveDraft = async () => {
+    const ok = await saveToDb("draft");
+    if (ok) toast.success("تم حفظ المسودة بنجاح");
+  };
+
+  const handleSubmit = async () => {
+    const ok = await saveToDb("submitted");
+    if (ok) {
+      toast.success("تم إرسال التقييم بنجاح");
+      navigate("/evaluations");
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
-      {/* Header */}
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold text-foreground">نموذج التقييم</h1>
+        <h1 className="text-2xl font-bold text-foreground">{editId ? "تعديل التقييم" : "نموذج التقييم"}</h1>
 
         {/* Organization Selector */}
         <Card className="border shadow-sm">
@@ -188,13 +244,13 @@ const EvaluationForm = () => {
         </Button>
 
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleSaveDraft} className="gap-2">
-            <Save className="w-4 h-4" />
+          <Button variant="outline" onClick={handleSaveDraft} disabled={saving} className="gap-2">
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             حفظ مسودة
           </Button>
           {currentSection === sections.length - 1 ? (
-            <Button onClick={handleSubmit} className="gap-2">
-              <Send className="w-4 h-4" />
+            <Button onClick={handleSubmit} disabled={saving} className="gap-2">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               إرسال التقييم
             </Button>
           ) : (
