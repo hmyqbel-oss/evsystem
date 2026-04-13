@@ -238,11 +238,11 @@ const PublicEvaluation = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center space-y-3"
           >
-            <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center">
-              <ClipboardCheck className="w-8 h-8 text-primary" />
+            <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center">
+              <ClipboardCheck className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
             </div>
-            <h1 className="text-2xl font-bold text-foreground">التقييم الذاتي للجمعية</h1>
-            <p className="text-muted-foreground">المرحلة الأولى: بيانات الجمعية</p>
+            <h1 className="text-lg sm:text-2xl font-bold text-foreground">التقييم الذاتي للجمعية</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground">المرحلة الأولى: بيانات الجمعية</p>
             <div className="flex justify-center gap-3">
               <StepIndicator active label="بيانات الجمعية" number={1} />
               <StepIndicator active={false} label="التقييم" number={2} />
@@ -253,9 +253,9 @@ const PublicEvaluation = () => {
           {/* Section 1: Organization Info */}
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <Card className="shadow-sm overflow-hidden">
-              <div className="bg-primary/5 border-b px-5 py-3 flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-primary" />
-                <h2 className="text-sm font-semibold text-foreground">معلومات الجمعية</h2>
+              <div className="bg-primary/5 border-b px-4 py-2.5 flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-primary" />
+                <h2 className="text-xs sm:text-sm font-semibold text-foreground">معلومات الجمعية</h2>
               </div>
               <CardContent className="p-5 space-y-4">
                 <IconField icon={Building2} label="اسم الجمعية" required>
@@ -295,9 +295,9 @@ const PublicEvaluation = () => {
           {/* Section 2: Data Entry Person */}
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
             <Card className="shadow-sm overflow-hidden">
-              <div className="bg-accent/5 border-b px-5 py-3 flex items-center gap-2">
-                <User className="w-5 h-5 text-accent-foreground" />
-                <h2 className="text-sm font-semibold text-foreground">بيانات مدخل البيانات</h2>
+              <div className="bg-accent/5 border-b px-4 py-2.5 flex items-center gap-2">
+                <User className="w-4 h-4 text-accent-foreground" />
+                <h2 className="text-xs sm:text-sm font-semibold text-foreground">بيانات مدخل البيانات</h2>
               </div>
               <CardContent className="p-5 space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -506,9 +506,9 @@ function IconField({
   icon: any; label: string; required?: boolean; children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1.5">
-      <Label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
-        <Icon className="w-3.5 h-3.5" />
+    <div className="space-y-1">
+      <Label className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+        <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
         {label}
         {required && <span className="text-destructive">*</span>}
       </Label>
@@ -520,7 +520,7 @@ function IconField({
 function StepIndicator({ active, completed, label, number }: { active: boolean; completed?: boolean; label: string; number: number }) {
   return (
     <div className="flex items-center gap-2">
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+      <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold ${
         completed ? "bg-success text-success-foreground" : active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
       }`}>
         {completed ? <CheckCircle2 className="w-4 h-4" /> : number}
