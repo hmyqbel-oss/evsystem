@@ -10,8 +10,9 @@ import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronRight, ChevronLeft, Save, Send, CheckCircle2,
-  Building2, Loader2, ClipboardCheck, PartyPopper,
+  Building2, Loader2, ClipboardCheck, PartyPopper, LogIn,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import RatingInput from "@/components/evaluation/RatingInput";
 
