@@ -96,7 +96,7 @@ const Dashboard = () => {
       <h1 className="text-2xl font-bold text-foreground">لوحة التحكم</h1>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {stats.map((stat, i) => (
           <motion.div key={stat.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
             <Card className="border-0 shadow-sm">
@@ -140,7 +140,7 @@ const Dashboard = () => {
             {scoreDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
-                  <Pie data={scoreDistribution} cx="50%" cy="50%" innerRadius={60} outerRadius={100} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                  <Pie data={scoreDistribution} cx="50%" cy="50%" innerRadius={50} outerRadius={85} dataKey="value" label={({ name, value }) => `${name}: ${value}`} fontSize={10}>
                     {scoreDistribution.map((_, i) => (<Cell key={i} fill={pieColors[i]} />))}
                   </Pie>
                   <Tooltip />
