@@ -369,8 +369,8 @@ const PublicEvaluation = () => {
                 }`}
               >
                 {isComplete && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                    <CheckCircle2 className="w-3 h-3 text-white" />
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-success rounded-full flex items-center justify-center">
+                    <CheckCircle2 className="w-3 h-3 text-success-foreground" />
                   </span>
                 )}
                 <span className="truncate w-full text-center leading-tight" style={{ fontSize: '11px' }}>{s.name}</span>
