@@ -193,7 +193,7 @@ const ResultsPage = () => {
               <BarChart data={sectionData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis type="number" domain={[0, 100]} />
-                <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={130} />
+                <YAxis dataKey="name" type="category" tick={{ fontSize: 9 }} width={100} />
                 <Tooltip formatter={(v: number) => [`${v}%`, "النتيجة"]} />
                 <Bar dataKey="score" radius={[0, 6, 6, 0]} barSize={20}>
                   {sectionData.map((entry, i) => (
