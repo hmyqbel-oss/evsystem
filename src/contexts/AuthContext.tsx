@@ -33,17 +33,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchUserProfile = async (userId: string) => {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("user_id", userId)
-      .single();
-
-    const { data: roleData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .single();
+    const [{ data: profile }, { data: roleData }] = await Promise.all([
+      supabase.from("profiles").select("full_name").eq("user_id", userId).single(),
+      supabase.from("user_roles").select("role").eq("user_id", userId).single(),
+    ]);
 
     setUserName(profile?.full_name || "");
     setRole((roleData?.role as UserRole) || "evaluator");
@@ -51,11 +44,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (_event, session) => {
         if (session?.user) {
           setUser(session.user);
-          // Use setTimeout to avoid deadlock with Supabase auth
-          setTimeout(() => fetchUserProfile(session.user.id), 0);
+          await fetchUserProfile(session.user.id);
         } else {
           setUser(null);
           setRole(null);
@@ -65,13 +57,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
         setUser(session.user);
-        fetchUserProfile(session.user.id);
-      } else {
-        setIsLoading(false);
+        await fetchUserProfile(session.user.id);
       }
+      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
