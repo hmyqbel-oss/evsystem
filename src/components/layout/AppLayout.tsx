@@ -13,7 +13,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
-import { LayoutDashboard, ClipboardCheck, Building2, FileBarChart, LogOut, Menu } from "lucide-react";
+import { LayoutDashboard, ClipboardCheck, Building2, FileBarChart, LogOut, Menu, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ReactNode } from "react";
 
