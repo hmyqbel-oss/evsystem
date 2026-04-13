@@ -359,27 +359,32 @@ const PublicEvaluation = () => {
             const isComplete = sAnswered === s.questions.length;
             const isActive = i === currentSection;
             return (
-              <button
+              <motion.button
                 key={s.name}
                 onClick={() => setCurrentSection(i)}
-                className={`relative flex-1 flex flex-col items-center gap-1 px-2 py-2.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                whileTap={{ scale: 0.95 }}
+                className={`relative flex-1 flex flex-col items-center gap-1 px-2 py-2.5 rounded-lg text-xs font-medium transition-colors duration-200 ${
                   isActive
                     ? "bg-primary text-primary-foreground shadow-md"
                     : "text-muted-foreground hover:bg-muted/50"
                 }`}
               >
                 {isComplete && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-success rounded-full flex items-center justify-center">
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-1 -right-1 w-4 h-4 bg-success rounded-full flex items-center justify-center"
+                  >
                     <CheckCircle2 className="w-3 h-3 text-success-foreground" />
-                  </span>
+                  </motion.span>
                 )}
                 <span className="truncate w-full text-center leading-tight" style={{ fontSize: '11px' }}>{s.name}</span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold transition-colors duration-200 ${
                   isActive ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"
                 }`}>
                   {sAnswered}/{s.questions.length}
                 </span>
-              </button>
+              </motion.button>
             );
           })}
         </div>
@@ -387,10 +392,10 @@ const PublicEvaluation = () => {
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSection}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className="space-y-4"
           >
             {section.questions.map((q) => (
