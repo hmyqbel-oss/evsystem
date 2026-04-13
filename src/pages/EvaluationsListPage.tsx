@@ -83,7 +83,7 @@ const EvaluationsListPage = () => {
 
             return (
               <Card key={ev.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-4 flex items-center justify-between">
+                <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div className="flex-1">
                     <h3 className="font-semibold text-foreground">{orgName}</h3>
                     <p className="text-sm text-muted-foreground">{date} — {evaluatorName} — الزيارة #{ev.visit_number}</p>

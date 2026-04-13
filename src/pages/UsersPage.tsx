@@ -151,8 +151,8 @@ const UsersPage = () => {
   );
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="p-4 md:p-6 max-w-6xl mx-auto space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">إدارة المستخدمين</h1>
           <p className="text-muted-foreground text-sm mt-1">إضافة وتعديل صلاحيات المستخدمين</p>
@@ -219,6 +219,7 @@ const UsersPage = () => {
               <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
             </div>
           ) : (
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -273,6 +274,7 @@ const UsersPage = () => {
                 )}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>

@@ -177,20 +177,20 @@ const EvaluationForm = () => {
         </motion.div>
       </AnimatePresence>
 
-      <div className="flex items-center justify-between pt-4">
-        <Button variant="outline" onClick={() => setCurrentSection(Math.max(0, currentSection - 1))} disabled={currentSection === 0} className="gap-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4">
+        <Button variant="outline" onClick={() => setCurrentSection(Math.max(0, currentSection - 1))} disabled={currentSection === 0} className="gap-2 text-xs sm:text-sm">
           <ChevronRight className="w-4 h-4" /> السابق
         </Button>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleSaveDraft} disabled={saving} className="gap-2">
+          <Button variant="outline" onClick={handleSaveDraft} disabled={saving} className="gap-2 flex-1 sm:flex-none text-xs sm:text-sm">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} حفظ مسودة
           </Button>
           {currentSection === sections.length - 1 ? (
-            <Button onClick={handleSubmit} disabled={saving} className="gap-2">
+            <Button onClick={handleSubmit} disabled={saving} className="gap-2 flex-1 sm:flex-none text-xs sm:text-sm">
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />} إرسال التقييم
             </Button>
           ) : (
-            <Button onClick={() => setCurrentSection(Math.min(sections.length - 1, currentSection + 1))} className="gap-2">
+            <Button onClick={() => setCurrentSection(Math.min(sections.length - 1, currentSection + 1))} className="gap-2 flex-1 sm:flex-none text-xs sm:text-sm">
               التالي <ChevronLeft className="w-4 h-4" />
             </Button>
           )}
