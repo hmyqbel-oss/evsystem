@@ -53,6 +53,7 @@ const PublicEvaluation = () => {
 
   const handleOrgFormChange = (field: string, value: string) => {
     setOrgForm((prev) => ({ ...prev, [field]: value }));
+    if (orgSaved) setOrgSaved(false);
   };
 
   const saveOrgData = async (): Promise<boolean> => {
