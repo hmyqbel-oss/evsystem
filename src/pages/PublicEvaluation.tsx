@@ -19,6 +19,7 @@ import RatingInput from "@/components/evaluation/RatingInput";
 type Step = "org-info" | "evaluation" | "thank-you";
 
 const PublicEvaluation = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState<Step>("org-info");
   const [orgForm, setOrgForm] = useState({
     name: "", city: "", region: "", license_number: "",
