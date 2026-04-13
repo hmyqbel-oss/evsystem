@@ -144,7 +144,7 @@ const EvaluationForm = () => {
           const sAnswered = s.questions.filter((q) => scores[q.id]).length;
           const isComplete = sAnswered === s.questions.length;
           return (
-            <button key={s.name} onClick={() => setCurrentSection(i)}
+            <button key={s.name} onClick={() => { setCurrentSection(i); window.scrollTo(0, 0); }}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
                 i === currentSection ? "bg-primary text-primary-foreground shadow-md" : "bg-card text-muted-foreground hover:bg-secondary"
               }`}>
@@ -178,7 +178,7 @@ const EvaluationForm = () => {
       </AnimatePresence>
 
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4">
-        <Button variant="outline" onClick={() => setCurrentSection(Math.max(0, currentSection - 1))} disabled={currentSection === 0} className="gap-2 text-xs sm:text-sm">
+        <Button variant="outline" onClick={() => { setCurrentSection(Math.max(0, currentSection - 1)); window.scrollTo(0, 0); }} disabled={currentSection === 0} className="gap-2 text-xs sm:text-sm">
           <ChevronRight className="w-4 h-4" /> السابق
         </Button>
         <div className="flex gap-2">
@@ -190,7 +190,7 @@ const EvaluationForm = () => {
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />} إرسال التقييم
             </Button>
           ) : (
-            <Button onClick={() => setCurrentSection(Math.min(sections.length - 1, currentSection + 1))} className="gap-2 flex-1 sm:flex-none text-xs sm:text-sm">
+            <Button onClick={() => { setCurrentSection(Math.min(sections.length - 1, currentSection + 1)); window.scrollTo(0, 0); }} className="gap-2 flex-1 sm:flex-none text-xs sm:text-sm">
               التالي <ChevronLeft className="w-4 h-4" />
             </Button>
           )}
