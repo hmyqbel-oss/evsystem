@@ -78,7 +78,7 @@ const EvaluationsListPage = () => {
             }
             const score = getOverallScore(numericScores);
             const orgName = ev.organizations?.name || "—";
-            const evaluatorName = ev.profiles?.full_name || "—";
+            const evaluatorName = "";
             const date = new Date(ev.created_at).toLocaleDateString("ar-SA");
 
             return (
