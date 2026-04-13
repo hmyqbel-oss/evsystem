@@ -1,15 +1,20 @@
 import { useState } from "react";
-import { sections, type Section } from "@/data/assessmentQuestions";
+import { sections } from "@/data/assessmentQuestions";
+import { sampleOrganizations } from "@/data/sampleData";
 import { getOverallScore, getScoreLabel, getScoreColor } from "@/data/sampleData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, ChevronLeft, Save, Send, CheckCircle2 } from "lucide-react";
+import { ChevronRight, ChevronLeft, Save, Send, CheckCircle2, Building2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import RatingInput from "@/components/evaluation/RatingInput";
 
 const EvaluationForm = () => {
+  const [selectedOrgId, setSelectedOrgId] = useState<string>("");
   const [currentSection, setCurrentSection] = useState(0);
   const [scores, setScores] = useState<Record<number, number>>({});
   const totalQuestions = 80;
@@ -17,16 +22,25 @@ const EvaluationForm = () => {
   const progressPct = Math.round((answeredCount / totalQuestions) * 100);
 
   const section = sections[currentSection];
+  const selectedOrg = sampleOrganizations.find((o) => o.id === selectedOrgId);
 
   const handleScore = (questionId: number, score: number) => {
     setScores((prev) => ({ ...prev, [questionId]: score }));
   };
 
   const handleSaveDraft = () => {
+    if (!selectedOrgId) {
+      toast.error("يرجى اختيار الجمعية أولاً");
+      return;
+    }
     toast.success("تم حفظ المسودة بنجاح");
   };
 
   const handleSubmit = () => {
+    if (!selectedOrgId) {
+      toast.error("يرجى اختيار الجمعية أولاً");
+      return;
+    }
     if (answeredCount < totalQuestions) {
       toast.error(`يرجى الإجابة على جميع الأسئلة (${answeredCount}/${totalQuestions})`);
       return;
@@ -41,6 +55,48 @@ const EvaluationForm = () => {
       {/* Header */}
       <div className="space-y-4">
         <h1 className="text-2xl font-bold text-foreground">نموذج التقييم</h1>
+
+        {/* Organization Selector */}
+        <Card className="border shadow-sm">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-primary" />
+              <label className="text-sm font-medium text-foreground">الجمعية المُقيَّمة *</label>
+            </div>
+            <Select value={selectedOrgId} onValueChange={setSelectedOrgId}>
+              <SelectTrigger className={!selectedOrgId ? "border-destructive/50" : ""}>
+                <SelectValue placeholder="اختر الجمعية..." />
+              </SelectTrigger>
+              <SelectContent>
+                {sampleOrganizations.map((org) => (
+                  <SelectItem key={org.id} value={org.id}>
+                    <div className="flex items-center gap-2">
+                      <span>{org.name}</span>
+                      <span className="text-xs text-muted-foreground">— {org.city}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {selectedOrg && (
+              <div className="flex items-center gap-4 text-xs text-muted-foreground bg-muted/50 rounded-lg p-3">
+                <span>ترخيص: {selectedOrg.licenseNumber}</span>
+                <span>•</span>
+                <span>{selectedOrg.city} — {selectedOrg.region}</span>
+                <span>•</span>
+                <span>{selectedOrg.membersCount} عضو</span>
+              </div>
+            )}
+            {!selectedOrgId && (
+              <p className="text-xs text-destructive flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" />
+                يجب اختيار الجمعية قبل بدء التقييم
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Progress */}
         <Card className="border-0 shadow-sm bg-card">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
@@ -90,7 +146,7 @@ const EvaluationForm = () => {
           transition={{ duration: 0.3 }}
           className="space-y-4"
         >
-          {section.questions.map((q, idx) => (
+          {section.questions.map((q) => (
             <Card key={q.id} className="border shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-5">
                 <div className="flex items-start gap-3">
