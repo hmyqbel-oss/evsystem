@@ -193,7 +193,7 @@ const ResultsPage = () => {
               <BarChart data={sectionData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis type="number" domain={[0, 100]} />
-                <YAxis dataKey="name" type="category" tick={{ fontSize: 9 }} width={100} />
+                <YAxis dataKey="name" type="category" tick={{ fontSize: 9 }} width={80} />
                 <Tooltip formatter={(v: number) => [`${v}%`, "النتيجة"]} />
                 <Bar dataKey="score" radius={[0, 6, 6, 0]} barSize={20}>
                   {sectionData.map((entry, i) => (
@@ -231,14 +231,14 @@ const ResultsPage = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue={sections[0].name} dir="rtl">
-            <TabsList className="w-full flex-wrap h-auto gap-1 bg-muted/50 p-1.5 overflow-x-auto">
+            <TabsList className="w-full flex-wrap h-auto gap-1 bg-muted/50 p-1.5 overflow-x-auto justify-start">
               {sections.map((s, i) => {
                 const startId = i * 16 + 1;
                 const sScore = getSectionScore(scores, startId, 16);
                 return (
-                  <TabsTrigger key={s.name} value={s.name} className="text-xs flex-1 min-w-[80px]">
+                  <TabsTrigger key={s.name} value={s.name} className="text-[10px] sm:text-xs flex-1 min-w-[60px] sm:min-w-[80px] px-1.5 sm:px-3">
                     <span className="truncate">{s.name}</span>
-                    <span className={`mr-1 text-[10px] ${getScoreColor(sScore)}`}>({sScore}%)</span>
+                    <span className={`mr-1 text-[9px] sm:text-[10px] ${getScoreColor(sScore)}`}>({sScore}%)</span>
                   </TabsTrigger>
                 );
               })}
