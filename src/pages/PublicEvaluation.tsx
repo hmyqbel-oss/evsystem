@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { sections } from "@/data/assessmentQuestions";
 import { getOverallScore, getScoreLabel, getScoreColor } from "@/data/sampleData";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,35 +7,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronRight, ChevronLeft, Save, Send, CheckCircle2,
-  Building2, AlertCircle, Loader2, ClipboardCheck, PartyPopper,
+  Building2, Loader2, ClipboardCheck, PartyPopper,
 } from "lucide-react";
 import { toast } from "sonner";
 import RatingInput from "@/components/evaluation/RatingInput";
 
 type Step = "org-info" | "evaluation" | "thank-you";
 
-interface OrgData {
-  id: string;
-  name: string;
-  city: string;
-  region: string;
-  license_number: string;
-  members_count: number;
-  email: string;
-  phone: string;
-  founded_date: string | null;
-}
-
 const PublicEvaluation = () => {
   const [step, setStep] = useState<Step>("org-info");
-  const [orgs, setOrgs] = useState<OrgData[]>([]);
-  const [selectedOrgId, setSelectedOrgId] = useState("");
   const [orgForm, setOrgForm] = useState({
     name: "", city: "", region: "", license_number: "",
     members_count: 0, email: "", phone: "", founded_date: "",
@@ -44,44 +26,18 @@ const PublicEvaluation = () => {
   const [currentSection, setCurrentSection] = useState(0);
   const [scores, setScores] = useState<Record<number, number>>({});
   const [saving, setSaving] = useState(false);
+  const [orgId, setOrgId] = useState<string | null>(null);
   const [evaluationId, setEvaluationId] = useState<string | null>(null);
 
   const totalQuestions = 80;
   const answeredCount = Object.keys(scores).length;
   const progressPct = Math.round((answeredCount / totalQuestions) * 100);
 
-  useEffect(() => {
-    supabase.from("organizations").select("*").then(({ data }) => {
-      if (data) setOrgs(data as OrgData[]);
-    });
-  }, []);
-
-  // When org is selected, populate form
-  useEffect(() => {
-    const org = orgs.find((o) => o.id === selectedOrgId);
-    if (org) {
-      setOrgForm({
-        name: org.name,
-        city: org.city,
-        region: org.region,
-        license_number: org.license_number,
-        members_count: org.members_count,
-        email: org.email,
-        phone: org.phone,
-        founded_date: org.founded_date || "",
-      });
-    }
-  }, [selectedOrgId, orgs]);
-
   const handleOrgFormChange = (field: string, value: string | number) => {
     setOrgForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleProceedToEvaluation = async () => {
-    if (!selectedOrgId) {
-      toast.error("يرجى اختيار الجمعية أولاً");
-      return;
-    }
     if (!orgForm.name.trim()) {
       toast.error("يرجى إدخال اسم الجمعية");
       return;
@@ -89,10 +45,10 @@ const PublicEvaluation = () => {
 
     setSaving(true);
     try {
-      // Update organization data
-      const { error } = await supabase
+      // Create new organization record
+      const { data, error } = await supabase
         .from("organizations")
-        .update({
+        .insert({
           name: orgForm.name,
           city: orgForm.city,
           region: orgForm.region,
@@ -102,9 +58,11 @@ const PublicEvaluation = () => {
           phone: orgForm.phone,
           founded_date: orgForm.founded_date || null,
         })
-        .eq("id", selectedOrgId);
+        .select("id")
+        .single();
 
       if (error) throw error;
+      setOrgId(data.id);
       setStep("evaluation");
     } catch (err: any) {
       toast.error("حدث خطأ: " + (err.message || ""));
@@ -120,10 +78,11 @@ const PublicEvaluation = () => {
   };
 
   const saveToDb = async (status: "draft" | "submitted") => {
+    if (!orgId) return false;
     setSaving(true);
     try {
       const payload = {
-        organization_id: selectedOrgId,
+        organization_id: orgId,
         evaluator_id: null,
         scores: scores as any,
         status,
@@ -212,70 +171,39 @@ const PublicEvaluation = () => {
             </div>
           </div>
 
-          {/* Organization Selector */}
+          {/* Org Form */}
           <Card className="shadow-sm">
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center gap-2 mb-2">
                 <Building2 className="w-5 h-5 text-primary" />
-                <Label className="text-base font-semibold">اختر الجمعية</Label>
+                <h2 className="text-base font-semibold text-foreground">بيانات الجمعية</h2>
               </div>
-              <Select value={selectedOrgId} onValueChange={setSelectedOrgId}>
-                <SelectTrigger className={!selectedOrgId ? "border-destructive/50" : ""}>
-                  <SelectValue placeholder="اختر جمعيتك من القائمة..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {orgs.map((org) => (
-                    <SelectItem key={org.id} value={org.id}>{org.name} — {org.city}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <p className="text-sm text-muted-foreground">يرجى تعبئة بيانات الجمعية للمتابعة</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField label="اسم الجمعية" value={orgForm.name} onChange={(v) => handleOrgFormChange("name", v)} required />
+                <FormField label="رقم الترخيص" value={orgForm.license_number} onChange={(v) => handleOrgFormChange("license_number", v)} />
+                <FormField label="المدينة" value={orgForm.city} onChange={(v) => handleOrgFormChange("city", v)} />
+                <FormField label="المنطقة" value={orgForm.region} onChange={(v) => handleOrgFormChange("region", v)} />
+                <FormField label="البريد الإلكتروني" value={orgForm.email} onChange={(v) => handleOrgFormChange("email", v)} type="email" />
+                <FormField label="رقم الهاتف" value={orgForm.phone} onChange={(v) => handleOrgFormChange("phone", v)} type="tel" />
+                <FormField label="تاريخ التأسيس" value={orgForm.founded_date} onChange={(v) => handleOrgFormChange("founded_date", v)} type="date" />
+                <div className="space-y-2">
+                  <Label className="text-sm">عدد الأعضاء</Label>
+                  <Input
+                    type="number"
+                    value={orgForm.members_count}
+                    onChange={(e) => handleOrgFormChange("members_count", Number(e.target.value))}
+                  />
+                </div>
+              </div>
+
+              <Button onClick={handleProceedToEvaluation} disabled={saving} className="w-full gap-2 mt-4">
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <ChevronLeft className="w-4 h-4" />}
+                الانتقال لمرحلة التقييم
+              </Button>
             </CardContent>
           </Card>
-
-          {/* Org Form */}
-          {selectedOrgId && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <Card className="shadow-sm">
-                <CardContent className="p-5 space-y-4">
-                  <h2 className="font-semibold text-foreground">بيانات الجمعية</h2>
-                  <p className="text-sm text-muted-foreground">يرجى مراجعة البيانات وتحديثها إن لزم الأمر</p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField label="اسم الجمعية" value={orgForm.name} onChange={(v) => handleOrgFormChange("name", v)} required />
-                    <FormField label="رقم الترخيص" value={orgForm.license_number} onChange={(v) => handleOrgFormChange("license_number", v)} />
-                    <FormField label="المدينة" value={orgForm.city} onChange={(v) => handleOrgFormChange("city", v)} />
-                    <FormField label="المنطقة" value={orgForm.region} onChange={(v) => handleOrgFormChange("region", v)} />
-                    <FormField label="البريد الإلكتروني" value={orgForm.email} onChange={(v) => handleOrgFormChange("email", v)} type="email" />
-                    <FormField label="رقم الهاتف" value={orgForm.phone} onChange={(v) => handleOrgFormChange("phone", v)} type="tel" />
-                    <FormField label="تاريخ التأسيس" value={orgForm.founded_date} onChange={(v) => handleOrgFormChange("founded_date", v)} type="date" />
-                    <div className="space-y-2">
-                      <Label className="text-sm">عدد الأعضاء</Label>
-                      <Input
-                        type="number"
-                        value={orgForm.members_count}
-                        onChange={(e) => handleOrgFormChange("members_count", Number(e.target.value))}
-                      />
-                    </div>
-                  </div>
-
-                  <Button onClick={handleProceedToEvaluation} disabled={saving} className="w-full gap-2 mt-4">
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <ChevronLeft className="w-4 h-4" />}
-                    الانتقال لمرحلة التقييم
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-
-          {!selectedOrgId && (
-            <p className="text-sm text-destructive flex items-center justify-center gap-1">
-              <AlertCircle className="w-4 h-4" />
-              يرجى اختيار الجمعية للمتابعة
-            </p>
-          )}
         </div>
       </div>
     );
