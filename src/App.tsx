@@ -27,7 +27,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function AppRoutes() {
   const { isAuthenticated, isLoading, role } = useAuth();
-  const loginElement = isLoading
+  const loginElement = (isLoading || (isAuthenticated && role === null))
     ? <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin" /></div>
     : isAuthenticated
       ? role === "admin"
