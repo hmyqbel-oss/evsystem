@@ -44,7 +44,7 @@ const PublicEvaluation = () => {
   const [scores, setScores] = useState<Record<number, number>>({});
   const [saving, setSaving] = useState(false);
   const [orgId, setOrgId] = useState<string | null>(null);
-  const [evaluationId, setEvaluationId] = useState<string | null>(null);
+  const [orgSaved, setOrgSaved] = useState(false);
 
   const totalQuestions = 80;
   const answeredCount = Object.keys(scores).length;
