@@ -59,40 +59,40 @@ export type Database = {
         Row: {
           city: string
           created_at: string
+          data_entry_name: string
+          data_entry_role: string
           email: string
-          founded_date: string | null
           id: string
-          license_number: string
-          members_count: number
           name: string
           phone: string
           region: string
+          specialty: string
           updated_at: string
         }
         Insert: {
           city?: string
           created_at?: string
+          data_entry_name?: string
+          data_entry_role?: string
           email?: string
-          founded_date?: string | null
           id?: string
-          license_number?: string
-          members_count?: number
           name: string
           phone?: string
           region?: string
+          specialty?: string
           updated_at?: string
         }
         Update: {
           city?: string
           created_at?: string
+          data_entry_name?: string
+          data_entry_role?: string
           email?: string
-          founded_date?: string | null
           id?: string
-          license_number?: string
-          members_count?: number
           name?: string
           phone?: string
           region?: string
+          specialty?: string
           updated_at?: string
         }
         Relationships: []
