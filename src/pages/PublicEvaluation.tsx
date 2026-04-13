@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { sections } from "@/data/assessmentQuestions";
 import { getOverallScore, getScoreLabel, getScoreColor } from "@/data/sampleData";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,14 +13,27 @@ import {
   ChevronRight, ChevronLeft, Save, Send, CheckCircle2,
   Building2, Loader2, ClipboardCheck, PartyPopper, LogIn,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import RatingInput from "@/components/evaluation/RatingInput";
 
 type Step = "org-info" | "evaluation" | "thank-you";
 
-const PublicEvaluation = () => {
+function TopBar() {
   const navigate = useNavigate();
+  return (
+    <div className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50">
+      <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+        <h2 className="text-sm font-semibold text-foreground">منصة التقييم الذاتي</h2>
+        <Button variant="ghost" size="sm" onClick={() => navigate("/login")} className="gap-2 text-muted-foreground">
+          <LogIn className="w-4 h-4" />
+          تسجيل الدخول
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+const PublicEvaluation = () => {
   const [step, setStep] = useState<Step>("org-info");
   const [orgForm, setOrgForm] = useState({
     name: "", city: "", region: "", license_number: "",
@@ -44,10 +58,8 @@ const PublicEvaluation = () => {
       toast.error("يرجى إدخال اسم الجمعية");
       return;
     }
-
     setSaving(true);
     try {
-      // Create new organization record
       const { data, error } = await supabase
         .from("organizations")
         .insert({
@@ -62,7 +74,6 @@ const PublicEvaluation = () => {
         })
         .select("id")
         .single();
-
       if (error) throw error;
       setOrgId(data.id);
       setStep("evaluation");
@@ -89,7 +100,6 @@ const PublicEvaluation = () => {
         scores: scores as any,
         status,
       };
-
       if (evaluationId) {
         const { error } = await supabase.from("evaluations").update(payload).eq("id", evaluationId);
         if (error) throw error;
@@ -126,51 +136,43 @@ const PublicEvaluation = () => {
     const score = getOverallScore(scores);
     return (
       <div className="min-h-screen bg-background">
-        <div className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50">
-          <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-foreground">منصة التقييم الذاتي</h2>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/login")} className="gap-2 text-muted-foreground">
-              <LogIn className="w-4 h-4" />
-              تسجيل الدخول
-            </Button>
-          </div>
-        </div>
+        <TopBar />
         <div className="flex items-center justify-center p-4" style={{ minHeight: "calc(100vh - 57px)" }}>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-lg w-full text-center space-y-6"
-        >
-          <div className="w-20 h-20 mx-auto rounded-full bg-success/10 flex items-center justify-center">
-            <PartyPopper className="w-10 h-10 text-success" />
-          </div>
-          <h1 className="text-3xl font-bold text-foreground">شكراً لك!</h1>
-          <p className="text-muted-foreground text-lg">
-            تم إرسال التقييم بنجاح. نشكركم على استكمال التقييم الذاتي للجمعية.
-          </p>
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-6 space-y-3">
-              <p className="text-sm text-muted-foreground">النتيجة الإجمالية</p>
-              <div className={`text-4xl font-bold ${getScoreColor(score)}`}>{score}%</div>
-              <div className={`text-lg font-medium ${getScoreColor(score)}`}>{getScoreLabel(score)}</div>
-            </CardContent>
-          </Card>
-          <p className="text-sm text-muted-foreground">
-            سيتم مراجعة التقييم من قبل الفريق المختص. شكراً لتعاونكم.
-          </p>
-        </motion.div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-lg w-full text-center space-y-6"
+          >
+            <div className="w-20 h-20 mx-auto rounded-full bg-success/10 flex items-center justify-center">
+              <PartyPopper className="w-10 h-10 text-success" />
+            </div>
+            <h1 className="text-3xl font-bold text-foreground">شكراً لك!</h1>
+            <p className="text-muted-foreground text-lg">
+              تم إرسال التقييم بنجاح. نشكركم على استكمال التقييم الذاتي للجمعية.
+            </p>
+            <Card className="border-0 shadow-sm">
+              <CardContent className="p-6 space-y-3">
+                <p className="text-sm text-muted-foreground">النتيجة الإجمالية</p>
+                <div className={`text-4xl font-bold ${getScoreColor(score)}`}>{score}%</div>
+                <div className={`text-lg font-medium ${getScoreColor(score)}`}>{getScoreLabel(score)}</div>
+              </CardContent>
+            </Card>
+            <p className="text-sm text-muted-foreground">
+              سيتم مراجعة التقييم من قبل الفريق المختص. شكراً لتعاونكم.
+            </p>
+          </motion.div>
+        </div>
       </div>
-      </div>
-      </div>
+    );
   }
 
   // ─── STEP: Organization Info ───
   if (step === "org-info") {
     return (
       <div className="min-h-screen bg-background">
+        <TopBar />
         <div className="max-w-2xl mx-auto p-4 md:p-8 space-y-6">
-          {/* Header */}
           <div className="text-center space-y-3">
             <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center">
               <ClipboardCheck className="w-8 h-8 text-primary" />
@@ -184,7 +186,6 @@ const PublicEvaluation = () => {
             </div>
           </div>
 
-          {/* Org Form */}
           <Card className="shadow-sm">
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center gap-2 mb-2">
@@ -225,8 +226,8 @@ const PublicEvaluation = () => {
   // ─── STEP: Evaluation ───
   return (
     <div className="min-h-screen bg-background">
+      <TopBar />
       <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
-        {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold text-foreground">التقييم الذاتي</h1>
           <p className="text-muted-foreground">المرحلة الثانية: تعبئة نموذج التقييم</p>
@@ -237,7 +238,6 @@ const PublicEvaluation = () => {
           </div>
         </div>
 
-        {/* Progress */}
         <Card className="border-0 shadow-sm bg-card">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
@@ -249,7 +249,6 @@ const PublicEvaluation = () => {
           </CardContent>
         </Card>
 
-        {/* Section Tabs */}
         <div className="flex gap-2 overflow-x-auto pb-2">
           {sections.map((s, i) => {
             const sAnswered = s.questions.filter((q) => scores[q.id]).length;
@@ -276,7 +275,6 @@ const PublicEvaluation = () => {
           })}
         </div>
 
-        {/* Questions */}
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSection}
@@ -305,7 +303,6 @@ const PublicEvaluation = () => {
           </motion.div>
         </AnimatePresence>
 
-        {/* Navigation */}
         <div className="flex items-center justify-between pt-4">
           <div className="flex gap-2">
             {currentSection === 0 && (
@@ -321,7 +318,6 @@ const PublicEvaluation = () => {
               </Button>
             )}
           </div>
-
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleSaveDraft} disabled={saving} className="gap-2">
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -341,7 +337,6 @@ const PublicEvaluation = () => {
           </div>
         </div>
 
-        {/* Score Preview */}
         {answeredCount > 0 && (
           <Card className="border-0 bg-card shadow-sm">
             <CardContent className="p-4 flex items-center justify-between">
