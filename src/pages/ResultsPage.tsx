@@ -136,14 +136,14 @@ const ResultsPage = () => {
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link to="/evaluations">
             <Button variant="ghost" size="icon"><ArrowRight className="w-5 h-5" /></Button>
           </Link>
-          <h1 className="text-2xl font-bold text-foreground">تقرير التقييم</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">تقرير التقييم</h1>
         </div>
-        <Button onClick={handleExportExcel} className="gap-2">
+        <Button onClick={handleExportExcel} className="gap-2 w-full sm:w-auto">
           <Download className="w-4 h-4" />
           تحميل Excel
         </Button>
@@ -231,13 +231,13 @@ const ResultsPage = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue={sections[0].name} dir="rtl">
-            <TabsList className="w-full flex-wrap h-auto gap-1 bg-muted/50 p-1.5">
+            <TabsList className="w-full flex-wrap h-auto gap-1 bg-muted/50 p-1.5 overflow-x-auto">
               {sections.map((s, i) => {
                 const startId = i * 16 + 1;
                 const sScore = getSectionScore(scores, startId, 16);
                 return (
-                  <TabsTrigger key={s.name} value={s.name} className="text-xs flex-1 min-w-[100px]">
-                    {s.name}
+                  <TabsTrigger key={s.name} value={s.name} className="text-xs flex-1 min-w-[80px]">
+                    <span className="truncate">{s.name}</span>
                     <span className={`mr-1 text-[10px] ${getScoreColor(sScore)}`}>({sScore}%)</span>
                   </TabsTrigger>
                 );
@@ -248,7 +248,7 @@ const ResultsPage = () => {
                 {s.questions.map((q) => {
                   const score = scores[q.id] || 0;
                   return (
-                    <div key={q.id} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                    <div key={q.id} className="flex flex-col sm:flex-row items-start gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
                       <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
                         {q.id}
                       </span>

@@ -123,7 +123,7 @@ const Dashboard = () => {
               <BarChart data={sectionAvgData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 12 }} />
-                <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} width={130} />
+                <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={100} />
                 <Tooltip formatter={(v: number) => [`${v}%`, "النتيجة"]} />
                 <Bar dataKey="score" radius={[0, 6, 6, 0]} barSize={24}>
                   {sectionAvgData.map((entry, i) => (<Cell key={i} fill={entry.fill} />))}

@@ -355,7 +355,7 @@ const PublicEvaluation = () => {
           </CardContent>
         </Card>
 
-        <div className="bg-card rounded-xl shadow-sm border p-1.5 flex items-center gap-1">
+        <div className="bg-card rounded-xl shadow-sm border p-1.5 flex items-center gap-1 overflow-x-auto">
           {sections.map((s, i) => {
             const sAnswered = s.questions.filter((q) => scores[q.id]).length;
             const isComplete = sAnswered === s.questions.length;
@@ -365,7 +365,7 @@ const PublicEvaluation = () => {
                 key={s.name}
                 onClick={() => setCurrentSection(i)}
                 whileTap={{ scale: 0.95 }}
-                className={`relative flex-1 flex flex-col items-center gap-1 px-2 py-2.5 rounded-lg text-xs font-medium transition-colors duration-200 ${
+                className={`relative flex-1 min-w-[80px] flex flex-col items-center gap-1 px-2 py-2.5 rounded-lg text-xs font-medium transition-colors duration-200 ${
                   isActive
                     ? "bg-primary text-primary-foreground shadow-md"
                     : "text-muted-foreground hover:bg-muted/50"
@@ -419,33 +419,33 @@ const PublicEvaluation = () => {
           </motion.div>
         </AnimatePresence>
 
-        <div className="flex items-center justify-between pt-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4">
           <div className="flex gap-2">
             {currentSection === 0 && (
-              <Button variant="outline" onClick={() => setStep("org-info")} className="gap-2">
+              <Button variant="outline" onClick={() => setStep("org-info")} className="gap-2 flex-1 sm:flex-none text-xs sm:text-sm">
                 <ChevronRight className="w-4 h-4" />
                 العودة لبيانات الجمعية
               </Button>
             )}
             {currentSection > 0 && (
-              <Button variant="outline" onClick={() => setCurrentSection(currentSection - 1)} className="gap-2">
+              <Button variant="outline" onClick={() => setCurrentSection(currentSection - 1)} className="gap-2 flex-1 sm:flex-none text-xs sm:text-sm">
                 <ChevronRight className="w-4 h-4" />
                 السابق
               </Button>
             )}
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={handleSaveDraft} disabled={saving} className="gap-2">
+            <Button variant="outline" onClick={handleSaveDraft} disabled={saving} className="gap-2 flex-1 sm:flex-none text-xs sm:text-sm">
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               حفظ مسودة
             </Button>
             {currentSection === sections.length - 1 ? (
-              <Button onClick={handleSubmit} disabled={saving} className="gap-2">
+              <Button onClick={handleSubmit} disabled={saving} className="gap-2 flex-1 sm:flex-none text-xs sm:text-sm">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 إرسال التقييم
               </Button>
             ) : (
-              <Button onClick={() => setCurrentSection(currentSection + 1)} className="gap-2">
+              <Button onClick={() => setCurrentSection(currentSection + 1)} className="gap-2 flex-1 sm:flex-none text-xs sm:text-sm">
                 التالي
                 <ChevronLeft className="w-4 h-4" />
               </Button>
