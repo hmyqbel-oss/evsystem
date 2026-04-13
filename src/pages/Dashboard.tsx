@@ -1,39 +1,80 @@
-import { sampleEvaluations, sampleOrganizations, getSectionScore, getOverallScore, getScoreLabel, getScoreColor } from "@/data/sampleData";
+import {
+  sampleEvaluations,
+  sampleOrganizations,
+  getSectionScore,
+  getOverallScore,
+  getScoreLabel,
+  getScoreColor,
+} from "@/data/sampleData";
 import { sections, sectionColors } from "@/data/assessmentQuestions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+} from "recharts";
 import { ClipboardCheck, Building2, Users, TrendingUp } from "lucide-react";
 
 const Dashboard = () => {
-  const submittedEvals = sampleEvaluations.filter(e => e.status === "submitted");
-  const avgScore = Math.round(submittedEvals.reduce((sum, e) => sum + getOverallScore(e.scores), 0) / submittedEvals.length);
+  const submittedEvals = sampleEvaluations.filter((e) => e.status === "submitted");
+  const avgScore = Math.round(
+    submittedEvals.reduce((sum, e) => sum + getOverallScore(e.scores), 0) / submittedEvals.length,
+  );
 
   const sectionAvgData = sections.map((s, i) => {
     const startId = i * 16 + 1;
-    const avg = Math.round(submittedEvals.reduce((sum, e) => sum + getSectionScore(e.scores, startId, 16), 0) / submittedEvals.length);
+    const avg = Math.round(
+      submittedEvals.reduce((sum, e) => sum + getSectionScore(e.scores, startId, 16), 0) / submittedEvals.length,
+    );
     return { name: s.name, score: avg, fill: sectionColors[i] };
   });
 
-  const orgScores = sampleOrganizations.map(org => {
-    const orgEvals = submittedEvals.filter(e => e.organizationId === org.id);
-    const avg = orgEvals.length > 0 ? Math.round(orgEvals.reduce((s, e) => s + getOverallScore(e.scores), 0) / orgEvals.length) : 0;
+  const orgScores = sampleOrganizations.map((org) => {
+    const orgEvals = submittedEvals.filter((e) => e.organizationId === org.id);
+    const avg =
+      orgEvals.length > 0
+        ? Math.round(orgEvals.reduce((s, e) => s + getOverallScore(e.scores), 0) / orgEvals.length)
+        : 0;
     return { name: org.name, score: avg };
   });
 
   const scoreDistribution = [
-    { name: "ممتاز (80+)", value: submittedEvals.filter(e => getOverallScore(e.scores) >= 80).length },
-    { name: "جيد (60-79)", value: submittedEvals.filter(e => getOverallScore(e.scores) >= 60 && getOverallScore(e.scores) < 80).length },
-    { name: "متوسط (40-59)", value: submittedEvals.filter(e => getOverallScore(e.scores) >= 40 && getOverallScore(e.scores) < 60).length },
-    { name: "ضعيف (<40)", value: submittedEvals.filter(e => getOverallScore(e.scores) < 40).length },
-  ].filter(d => d.value > 0);
+    { name: "ممتاز (80+)", value: submittedEvals.filter((e) => getOverallScore(e.scores) >= 80).length },
+    {
+      name: "جيد (60-79)",
+      value: submittedEvals.filter((e) => getOverallScore(e.scores) >= 60 && getOverallScore(e.scores) < 80).length,
+    },
+    {
+      name: "متوسط (40-59)",
+      value: submittedEvals.filter((e) => getOverallScore(e.scores) >= 40 && getOverallScore(e.scores) < 60).length,
+    },
+    { name: "ضعيف (<40)", value: submittedEvals.filter((e) => getOverallScore(e.scores) < 40).length },
+  ].filter((d) => d.value > 0);
 
   const pieColors = ["hsl(var(--success))", "hsl(var(--chart-1))", "hsl(var(--warning))", "hsl(var(--destructive))"];
 
   const stats = [
-    { label: "إجمالي التقييمات", value: sampleEvaluations.length, icon: ClipboardCheck, color: "bg-primary/10 text-primary" },
-    { label: "المنظمات", value: sampleOrganizations.length, icon: Building2, color: "bg-accent/10 text-accent" },
-    { label: "المُقيّمين", value: 2, icon: Users, color: "bg-warning/10 text-warning" },
+    {
+      label: "إجمالي التقييمات",
+      value: sampleEvaluations.length,
+      icon: ClipboardCheck,
+      color: "bg-primary/10 text-primary",
+    },
+    { label: "عدد الجمعيات", value: sampleOrganizations.length, icon: Building2, color: "bg-accent/10 text-accent" },
+    { label: "عدد المقيمين", value: 2, icon: Users, color: "bg-warning/10 text-warning" },
     { label: "متوسط النتيجة", value: `${avgScore}%`, icon: TrendingUp, color: "bg-success/10 text-success" },
   ];
 
@@ -44,7 +85,12 @@ const Dashboard = () => {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {stats.map((stat, i) => (
-          <motion.div key={stat.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
+          >
             <Card className="border-0 shadow-sm">
               <CardContent className="p-4 flex items-center gap-4">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.color}`}>
@@ -91,7 +137,15 @@ const Dashboard = () => {
           <CardContent className="flex items-center justify-center">
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
-                <Pie data={scoreDistribution} cx="50%" cy="50%" innerRadius={60} outerRadius={100} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                <Pie
+                  data={scoreDistribution}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  dataKey="value"
+                  label={({ name, value }) => `${name}: ${value}`}
+                >
                   {scoreDistribution.map((_, i) => (
                     <Cell key={i} fill={pieColors[i]} />
                   ))}
@@ -131,7 +185,13 @@ const Dashboard = () => {
                 <PolarGrid stroke="hsl(var(--border))" />
                 <PolarAngleAxis dataKey="name" tick={{ fontSize: 10 }} />
                 <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
-                <Radar dataKey="score" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.2} strokeWidth={2} />
+                <Radar
+                  dataKey="score"
+                  stroke="hsl(var(--primary))"
+                  fill="hsl(var(--primary))"
+                  fillOpacity={0.2}
+                  strokeWidth={2}
+                />
               </RadarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -167,9 +227,11 @@ const Dashboard = () => {
                         <span className={`font-bold ${getScoreColor(score)}`}>{score}%</span>
                       </td>
                       <td className="py-3 px-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          ev.status === "submitted" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
-                        }`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            ev.status === "submitted" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
+                          }`}
+                        >
                           {ev.status === "submitted" ? "مكتمل" : "مسودة"}
                         </span>
                       </td>
