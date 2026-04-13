@@ -207,9 +207,7 @@ const PublicEvaluation = () => {
               <PartyPopper className="w-10 h-10 text-success" />
             </div>
             <h1 className="text-3xl font-bold text-foreground">شكراً لك!</h1>
-            <p className="text-muted-foreground text-lg">
-              تم إرسال التقييم بنجاح. نشكركم على استكمال التقييم الذاتي للجمعية.
-            </p>
+            <p className="text-muted-foreground text-lg">تم إرسال التقييم بنجاح</p>
             <Card className="border-0 shadow-sm">
               <CardContent className="p-6 space-y-3">
                 <p className="text-sm text-muted-foreground">النتيجة الإجمالية</p>
@@ -217,9 +215,10 @@ const PublicEvaluation = () => {
                 <div className={`text-lg font-medium ${getScoreColor(score)}`}>{getScoreLabel(score)}</div>
               </CardContent>
             </Card>
-            <p className="text-sm text-muted-foreground">
-              سيتم مراجعة التقييم من قبل الفريق المختص. شكراً لتعاونكم.
-            </p>
+            <div className="space-y-3 text-sm sm:text-base text-muted-foreground leading-relaxed">
+              <p>نشكر لكم وقتكم وتعاونكم، ومساهمتكم القيمة في إنجاح مشروع تطوير نماذج الاستدامة وتعزيز أثر الجمعيات الشبابية.</p>
+              <p>مشاركتكم تمثل خطوة مهمة نحو بناء أثر مستدام للقطاع الشبابي</p>
+            </div>
           </motion.div>
         </div>
       </div>
