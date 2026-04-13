@@ -231,20 +231,18 @@ const ResultsPage = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue={sections[0].name} dir="rtl">
-            <div className="w-full overflow-x-auto pb-2">
-              <TabsList className="inline-flex h-auto gap-1 bg-muted/50 p-1.5 w-max min-w-full">
-                {sections.map((s, i) => {
-                  const startId = i * 16 + 1;
-                  const sScore = getSectionScore(scores, startId, 16);
-                  return (
-                    <TabsTrigger key={s.name} value={s.name} className="text-[10px] sm:text-xs whitespace-nowrap px-2.5 sm:px-3 py-1.5">
-                      <span>{s.name}</span>
-                      <span className={`mr-1 text-[9px] sm:text-[10px] ${getScoreColor(sScore)}`}>({sScore}%)</span>
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
-            </div>
+            <TabsList className="flex flex-col sm:flex-row h-auto gap-1 bg-muted/50 p-1.5 w-full">
+              {sections.map((s, i) => {
+                const startId = i * 16 + 1;
+                const sScore = getSectionScore(scores, startId, 16);
+                return (
+                  <TabsTrigger key={s.name} value={s.name} className="text-xs w-full sm:flex-1 justify-between sm:justify-center px-3 py-2">
+                    <span>{s.name}</span>
+                    <span className={`mr-1 text-[10px] ${getScoreColor(sScore)}`}>({sScore}%)</span>
+                  </TabsTrigger>
+                );
+              })}
+            </TabsList>
             {sections.map((s) => (
               <TabsContent key={s.name} value={s.name} className="space-y-2 mt-4">
                 {s.questions.map((q) => {
