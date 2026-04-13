@@ -29,7 +29,7 @@ const EvaluationsListPage = () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("evaluations")
-      .select("*, organizations(name), profiles!evaluations_evaluator_id_fkey(full_name)")
+      .select("*, organizations(name)")
       .order("created_at", { ascending: false });
 
     if (!error && data) {
