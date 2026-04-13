@@ -80,6 +80,12 @@ const LoginPage = () => {
                 {loading ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : null}
                 دخول
               </Button>
+              <Button variant="ghost" size="sm" className="w-full" asChild>
+                <Link to="/">
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                  العودة للصفحة الرئيسية
+                </Link>
+              </Button>
             </form>
           </CardContent>
         </Card>
