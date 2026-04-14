@@ -11,6 +11,7 @@ import OrganizationsPage from "./pages/OrganizationsPage";
 
 import UsersPage from "./pages/UsersPage";
 import PublicEvaluation from "./pages/PublicEvaluation";
+import ResultsPage from "./pages/ResultsPage";
 import AppLayout from "./components/layout/AppLayout";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
@@ -47,6 +48,7 @@ function AppRoutes() {
       <Route path="/evaluations" element={<ProtectedRoute><EvaluationsListPage /></ProtectedRoute>} />
       <Route path="/organizations" element={<ProtectedRoute><OrganizationsPage /></ProtectedRoute>} />
       <Route path="/users" element={<ProtectedRoute><UsersPage /></ProtectedRoute>} />
+      <Route path="/results/:id" element={<ProtectedRoute><ResultsPage /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
