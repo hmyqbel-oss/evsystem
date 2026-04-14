@@ -18,7 +18,7 @@ const RatingInput = ({ value, onChange }: RatingInputProps) => {
           className="p-1 transition-transform hover:scale-110"
         >
           <Star
-            className={`w-6 h-6 transition-colors ${
+            className={`w-7 h-7 sm:w-8 sm:h-8 transition-colors ${
               star <= value
                 ? "fill-warning text-warning"
                 : "fill-none text-muted-foreground/30"

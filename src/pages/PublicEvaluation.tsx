@@ -230,7 +230,7 @@ const PublicEvaluation = () => {
     return (
       <div className="min-h-screen bg-background">
         <TopBar />
-        <div className="max-w-2xl mx-auto p-4 md:p-8 space-y-6">
+        <div className="max-w-2xl mx-auto px-4 py-6 md:p-8 space-y-6">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -240,8 +240,8 @@ const PublicEvaluation = () => {
             <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center">
               <ClipboardCheck className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
             </div>
-            <h1 className="text-lg sm:text-2xl font-bold text-foreground">التقييم الذاتي للجمعية</h1>
-            <p className="text-xs sm:text-sm text-muted-foreground">المرحلة الأولى: بيانات الجمعية</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">التقييم الذاتي للجمعية</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">المرحلة الأولى: بيانات الجمعية</p>
             <div className="flex justify-center gap-3">
               <StepIndicator active label="بيانات الجمعية" number={1} />
               <StepIndicator active={false} label="التقييم" number={2} />
@@ -256,13 +256,13 @@ const PublicEvaluation = () => {
                 <div className="absolute top-0 left-0 w-24 h-24 bg-primary/5 rounded-full -translate-x-1/2 -translate-y-1/2" />
                 <div className="absolute bottom-0 right-0 w-16 h-16 bg-primary/5 rounded-full translate-x-1/3 translate-y-1/3" />
                 <div className="relative space-y-3 text-right">
-                  <p className="text-xs sm:text-sm leading-relaxed text-foreground/85">
+                   <p className="text-sm sm:text-base leading-relaxed text-foreground/85">
                     في إطار مشروع تطوير نماذج الاستدامة وتعزيز أثر الجمعيات الشبابية، تم تطوير هذه الأداة لفهم واقع الجمعيات وتحليل قدراتها وتحديد فرص التطوير بناءً على بيانات دقيقة.
                   </p>
-                  <p className="text-xs sm:text-sm leading-relaxed text-foreground/85">
+                  <p className="text-sm sm:text-base leading-relaxed text-foreground/85">
                     تعتمد مخرجات المشروع بشكل مباشر على جودة البيانات المقدمة، حيث تسهم مشاركتكم الصادقة في تكوين صورة واقعية، وتحديد الفجوات، ودعم تصميم حلول عملية.
                   </p>
-                  <p className="text-xs sm:text-sm leading-relaxed text-foreground/85 font-medium">
+                  <p className="text-sm sm:text-base leading-relaxed text-foreground/85 font-medium">
                     نؤكد أن الهدف هو تمكين الجمعيات وتعزيز استدامتها، وليس التقييم الرقابي؛ لذا نأمل تعبئة البيانات بمصداقية عالية لضمان تحقيق أفضل النتائج لكم.
                   </p>
                 </div>
@@ -275,7 +275,7 @@ const PublicEvaluation = () => {
             <Card className="shadow-sm overflow-hidden">
               <div className="bg-primary/5 border-b px-4 py-2.5 flex items-center gap-2">
                 <Building2 className="w-4 h-4 text-primary" />
-                <h2 className="text-xs sm:text-sm font-semibold text-foreground">معلومات الجمعية</h2>
+                <h2 className="text-sm sm:text-base font-semibold text-foreground">معلومات الجمعية</h2>
               </div>
               <CardContent className="p-5 space-y-4">
                 <IconField icon={Building2} label="اسم الجمعية" required>
@@ -317,7 +317,7 @@ const PublicEvaluation = () => {
             <Card className="shadow-sm overflow-hidden">
               <div className="bg-accent/5 border-b px-4 py-2.5 flex items-center gap-2">
                 <User className="w-4 h-4 text-accent-foreground" />
-                <h2 className="text-xs sm:text-sm font-semibold text-foreground">بيانات مدخل البيانات</h2>
+                <h2 className="text-sm sm:text-base font-semibold text-foreground">بيانات مدخل البيانات</h2>
               </div>
               <CardContent className="p-5 space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -380,8 +380,8 @@ const PublicEvaluation = () => {
       <TopBar />
       <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold text-foreground">التقييم الذاتي</h1>
-          <p className="text-muted-foreground">المرحلة الثانية: تعبئة نموذج التقييم</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">التقييم الذاتي</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">المرحلة الثانية: تعبئة نموذج التقييم</p>
           <div className="flex justify-center gap-3">
             <StepIndicator active={false} completed label="بيانات الجمعية" number={1} />
             <StepIndicator active label="التقييم" number={2} />
@@ -425,7 +425,7 @@ const PublicEvaluation = () => {
                     <CheckCircle2 className="w-3 h-3 text-success-foreground" />
                   </motion.span>
                 )}
-                <span className="truncate text-right sm:text-center leading-tight flex-1 sm:flex-none sm:w-full" style={{ fontSize: '11px' }}>{s.name}</span>
+                <span className="truncate text-right sm:text-center leading-tight flex-1 sm:flex-none sm:w-full text-xs sm:text-xs">{s.name}</span>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold transition-colors duration-200 ${
                   isActive ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"
                 }`}>
@@ -453,8 +453,8 @@ const PublicEvaluation = () => {
                       {q.id}
                     </span>
                     <div className="flex-1 space-y-3">
-                      <p className="text-sm font-medium leading-relaxed text-foreground">{q.questionText}</p>
-                      <p className="text-xs text-muted-foreground">الأدلة المطلوبة: {q.evidence}</p>
+                      <p className="text-sm sm:text-base font-medium leading-relaxed text-foreground">{q.questionText}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">الأدلة المطلوبة: {q.evidence}</p>
                       <RatingInput value={scores[q.id] || 0} onChange={(val) => handleScore(q.id, val)} />
                     </div>
                   </div>
@@ -527,8 +527,8 @@ function IconField({
 }) {
   return (
     <div className="space-y-1">
-      <Label className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-1.5">
-        <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+      <Label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+        <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         {label}
         {required && <span className="text-destructive">*</span>}
       </Label>
