@@ -4,7 +4,7 @@ import { getOverallScore, getScoreColor } from "@/data/sampleData";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Plus, Eye, FileEdit, Loader2, Trash2, Download } from "lucide-react";
+import { Eye, FileEdit, Loader2, Trash2, Download } from "lucide-react";
 import { exportToExcel } from "@/lib/exportExcel";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -59,8 +59,7 @@ const EvaluationsListPage = () => {
     <div className="p-4 md:p-6 space-y-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <h1 className="text-2xl font-bold text-foreground">التقييمات</h1>
-        <div className="flex gap-2">
-          <Button variant="outline" className="gap-2" onClick={() => {
+        <Button variant="outline" className="gap-2" onClick={() => {
             const exportData = evaluations.map((ev) => {
               const numericScores: Record<number, number> = {};
               if (ev.scores && typeof ev.scores === "object") {
@@ -82,10 +81,6 @@ const EvaluationsListPage = () => {
           }}>
             <Download className="w-4 h-4" /> تصدير Excel
           </Button>
-          <Link to="/evaluations/new">
-            <Button className="gap-2"><Plus className="w-4 h-4" /> تقييم جديد</Button>
-          </Link>
-        </div>
       </div>
 
       {evaluations.length === 0 ? (
