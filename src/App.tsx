@@ -11,6 +11,7 @@ import OrganizationsPage from "./pages/OrganizationsPage";
 
 import UsersPage from "./pages/UsersPage";
 import PublicEvaluation from "./pages/PublicEvaluation";
+import ResultsPage from "./pages/ResultsPage";
 import AppLayout from "./components/layout/AppLayout";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
