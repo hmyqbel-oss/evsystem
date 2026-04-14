@@ -149,7 +149,7 @@ const EvaluationForm = () => {
                 i === currentSection ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:bg-muted/50"
               }`}>
               {isComplete && <CheckCircle2 className="w-4 h-4" />}
-              <span className="truncate text-right sm:text-center leading-tight flex-1 sm:flex-none sm:w-full" style={{ fontSize: '11px' }}>{s.name}</span>
+              <span className="truncate text-right sm:text-center leading-tight flex-1 sm:flex-none sm:w-full text-xs">{s.name}</span>
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
                 i === currentSection ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"
               }`}>{sAnswered}/{s.questions.length}</span>
