@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -93,6 +96,10 @@ const PublicEvaluation = () => {
   const saveOrgData = async (): Promise<boolean> => {
     if (!orgForm.name.trim()) {
       toast.error("يرجى إدخال اسم الجمعية");
+      return false;
+    }
+    if (!orgForm.region) {
+      toast.error("يرجى اختيار المنطقة");
       return false;
     }
     if (!orgForm.data_entry_name.trim()) {
@@ -286,12 +293,31 @@ const PublicEvaluation = () => {
                   />
                 </IconField>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <IconField icon={MapPin} label="المنطقة">
-                    <Input
-                      value={orgForm.region}
-                      onChange={(e) => handleOrgFormChange("region", e.target.value)}
-                      placeholder="مثال: منطقة الرياض"
-                    />
+                  <IconField icon={MapPin} label="المنطقة *">
+                    <Select value={orgForm.region} onValueChange={(val) => handleOrgFormChange("region", val)}>
+                      <SelectTrigger className={!orgForm.region ? "border-destructive/50" : ""}>
+                        <SelectValue placeholder="اختر المنطقة..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[
+                          "منطقة الرياض",
+                          "منطقة مكة المكرمة",
+                          "منطقة المدينة المنورة",
+                          "المنطقة الشرقية",
+                          "منطقة القصيم",
+                          "منطقة حائل",
+                          "منطقة تبوك",
+                          "منطقة الحدود الشمالية",
+                          "منطقة جازان",
+                          "منطقة نجران",
+                          "منطقة الباحة",
+                          "منطقة عسير",
+                          "منطقة الجوف",
+                        ].map((r) => (
+                          <SelectItem key={r} value={r}>{r}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </IconField>
                   <IconField icon={MapPin} label="المدينة">
                     <Input
