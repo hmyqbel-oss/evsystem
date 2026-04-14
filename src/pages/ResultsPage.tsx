@@ -41,11 +41,38 @@ const ResultsPage = () => {
     <div className="p-4 md:p-6 space-y-6 max-w-4xl mx-auto" dir="rtl">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <h1 className="text-2xl font-bold text-foreground">نتائج التقييم</h1>
-        <Link to="/evaluations">
-          <Button variant="outline" className="gap-2">
-            <ArrowRight className="w-4 h-4" /> العودة للتقييمات
+        <div className="flex gap-2">
+          <Button variant="outline" className="gap-2" onClick={() => {
+            const exportData = sections.flatMap((section) => 
+              section.questions.map((q) => ({
+                section: section.name,
+                questionId: q.id,
+                question: q.questionText,
+                score: scores[q.id] || 0,
+                maxScore: 5,
+              }))
+            );
+            exportData.push({
+              section: "الإجمالي",
+              questionId: 0,
+              question: "النتيجة الإجمالية",
+              score: overall,
+              maxScore: 100,
+            } as any);
+            exportToExcel(
+              exportData as unknown as Record<string, unknown>[],
+              { section: "المحور", questionId: "رقم السؤال", question: "السؤال", score: "الدرجة", maxScore: "الدرجة القصوى" },
+              `تقييم_${evaluation.organizations?.name || "غير محدد"}`
+            );
+          }}>
+            <Download className="w-4 h-4" /> تصدير Excel
           </Button>
-        </Link>
+          <Link to="/evaluations">
+            <Button variant="outline" className="gap-2">
+              <ArrowRight className="w-4 h-4" /> العودة للتقييمات
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Organization info */}
