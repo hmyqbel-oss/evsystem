@@ -293,9 +293,9 @@ const PublicEvaluation = () => {
                   />
                 </IconField>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <IconField icon={MapPin} label="المنطقة *">
+                  <IconField icon={MapPin} label="المنطقة" required>
                     <Select value={orgForm.region} onValueChange={(val) => handleOrgFormChange("region", val)}>
-                      <SelectTrigger className={!orgForm.region ? "border-destructive/50" : ""}>
+                      <SelectTrigger>
                         <SelectValue placeholder="اختر المنطقة..." />
                       </SelectTrigger>
                       <SelectContent>
@@ -327,13 +327,6 @@ const PublicEvaluation = () => {
                     />
                   </IconField>
                 </div>
-                <IconField icon={Briefcase} label="مجال تخصص الجمعية">
-                  <Input
-                    value={orgForm.specialty}
-                    onChange={(e) => handleOrgFormChange("specialty", e.target.value)}
-                    placeholder="مثال: التنمية المجتمعية، رعاية الأيتام..."
-                  />
-                </IconField>
               </CardContent>
             </Card>
           </motion.div>
