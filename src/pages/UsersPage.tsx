@@ -216,71 +216,96 @@ const UsersPage = () => {
         />
       </div>
 
-      {/* Table */}
-      <Card>
-        <CardContent className="p-0">
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>الاسم</TableHead>
-                  <TableHead>البريد الإلكتروني</TableHead>
-                  <TableHead>الهاتف</TableHead>
-                  <TableHead>الدور</TableHead>
-                  <TableHead>الحالة</TableHead>
-                  <TableHead>الإجراءات</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                      لا يوجد مستخدمون
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filtered.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.full_name || "—"}</TableCell>
-                      <TableCell dir="ltr" className="text-left">{user.email}</TableCell>
-                      <TableCell dir="ltr" className="text-left">{user.phone || "—"}</TableCell>
-                      <TableCell>
-                        <Badge variant="default">مدير</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={user.is_active ? "outline" : "destructive"} className={user.is_active ? "border-green-500 text-green-600" : ""}>
-                          {user.is_active ? "نشط" : "معطل"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button variant="ghost" size="sm" onClick={() => openEditDialog(user)}>
-                            تعديل
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className={user.is_active ? "text-destructive" : "text-green-600"}
-                            onClick={() => toggleActive(user)}
-                          >
-                            {user.is_active ? "تعطيل" : "تفعيل"}
-                          </Button>
-                        </div>
-                      </TableCell>
+      {/* Users List */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        </div>
+      ) : filtered.length === 0 ? (
+        <Card className="border-0 shadow-sm">
+          <CardContent className="p-8 text-center text-muted-foreground">
+            لا يوجد مستخدمون
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          {/* Desktop Table */}
+          <Card className="hidden md:block border-0 shadow-sm">
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>الاسم</TableHead>
+                      <TableHead>البريد الإلكتروني</TableHead>
+                      <TableHead>الهاتف</TableHead>
+                      <TableHead>الدور</TableHead>
+                      <TableHead>الحالة</TableHead>
+                      <TableHead>الإجراءات</TableHead>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                  </TableHeader>
+                  <TableBody>
+                    {filtered.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell className="font-medium">{user.full_name || "—"}</TableCell>
+                        <TableCell dir="ltr" className="text-left">{user.email}</TableCell>
+                        <TableCell dir="ltr" className="text-left">{user.phone || "—"}</TableCell>
+                        <TableCell>
+                          <Badge variant="default">مدير</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={user.is_active ? "outline" : "destructive"} className={user.is_active ? "border-green-500 text-green-600" : ""}>
+                            {user.is_active ? "نشط" : "معطل"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => openEditDialog(user)}>تعديل</Button>
+                            <Button variant="ghost" size="sm" className={user.is_active ? "text-destructive" : "text-green-600"} onClick={() => toggleActive(user)}>
+                              {user.is_active ? "تعطيل" : "تفعيل"}
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-3">
+            {filtered.map((user) => (
+              <Card key={user.id} className="border-0 shadow-sm">
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-semibold text-foreground truncate">{user.full_name || "—"}</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5 truncate" dir="ltr">{user.email}</p>
+                    </div>
+                    <div className="flex gap-1.5 flex-shrink-0 mr-2">
+                      <Badge variant="default" className="text-[10px]">مدير</Badge>
+                      <Badge variant={user.is_active ? "outline" : "destructive"} className={`text-[10px] ${user.is_active ? "border-green-500 text-green-600" : ""}`}>
+                        {user.is_active ? "نشط" : "معطل"}
+                      </Badge>
+                    </div>
+                  </div>
+                  {user.phone && (
+                    <p className="text-xs text-muted-foreground" dir="ltr">{user.phone}</p>
+                  )}
+                  <div className="flex gap-2 pt-1 border-t border-border/50">
+                    <Button variant="outline" size="sm" className="flex-1 h-8 text-xs" onClick={() => openEditDialog(user)}>تعديل</Button>
+                    <Button variant="outline" size="sm" className={`flex-1 h-8 text-xs ${user.is_active ? "text-destructive" : "text-green-600"}`} onClick={() => toggleActive(user)}>
+                      {user.is_active ? "تعطيل" : "تفعيل"}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
