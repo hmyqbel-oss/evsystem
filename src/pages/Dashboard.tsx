@@ -1,24 +1,16 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  getSectionScore,
-  getOverallScore,
-  getScoreLabel,
-  getScoreColor,
-} from "@/data/sampleData";
-import { sections, sectionColors } from "@/data/assessmentQuestions";
+import { sections } from "@/data/assessmentQuestions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
 } from "recharts";
-import { ClipboardCheck, Building2, TrendingUp, Loader2 } from "lucide-react";
+import { ClipboardCheck, Building2, Users, MapPin, Loader2, TrendingUp, Calendar } from "lucide-react";
 
 interface DbEvaluation {
   id: string;
   organization_id: string;
-  scores: Record<number, number>;
   status: string;
   created_at: string;
 }
@@ -26,21 +18,49 @@ interface DbEvaluation {
 interface DbOrganization {
   id: string;
   name: string;
+  city: string;
+  region: string;
+  specialty: string;
 }
+
+const StatCard = ({ icon: Icon, label, value, subtitle, color, delay }: {
+  icon: any; label: string; value: string | number; subtitle?: string; color: string; delay: number;
+}) => (
+  <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, duration: 0.4 }}>
+    <Card className="border-0 shadow-sm hover:shadow-md transition-shadow overflow-hidden relative">
+      <div className={`absolute top-0 right-0 w-24 h-24 rounded-full ${color} opacity-10 -translate-y-8 translate-x-8`} />
+      <CardContent className="p-5">
+        <div className="flex items-start gap-4">
+          <div className={`w-12 h-12 rounded-xl ${color} bg-opacity-15 flex items-center justify-center flex-shrink-0`}>
+            <Icon className="w-6 h-6" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-3xl font-bold text-foreground">{value}</p>
+            <p className="text-sm text-muted-foreground mt-0.5">{label}</p>
+            {subtitle && <p className="text-xs text-muted-foreground/70 mt-1">{subtitle}</p>}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </motion.div>
+);
 
 const Dashboard = () => {
   const [evaluations, setEvaluations] = useState<DbEvaluation[]>([]);
   const [organizations, setOrganizations] = useState<DbOrganization[]>([]);
+  const [userCount, setUserCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      const [evRes, orgRes] = await Promise.all([
-        supabase.from("evaluations").select("id, organization_id, scores, status, created_at").order("created_at", { ascending: false }),
-        supabase.from("organizations").select("id, name"),
+      const [evRes, orgRes, usersRes] = await Promise.all([
+        supabase.from("evaluations").select("id, organization_id, status, created_at").order("created_at", { ascending: false }),
+        supabase.from("organizations").select("id, name, city, region, specialty"),
+        supabase.from("profiles").select("id", { count: "exact", head: true }),
       ]);
       setEvaluations((evRes.data as any) || []);
       setOrganizations((orgRes.data as any) || []);
+      setUserCount(usersRes.count || 0);
       setLoading(false);
     };
     fetchData();
@@ -54,183 +74,144 @@ const Dashboard = () => {
     );
   }
 
-  const orgMap = Object.fromEntries(organizations.map((o) => [o.id, o.name]));
   const submittedEvals = evaluations.filter((e) => e.status === "submitted");
-  const avgScore = submittedEvals.length > 0
-    ? Math.round(submittedEvals.reduce((sum, e) => sum + getOverallScore(e.scores), 0) / submittedEvals.length)
-    : 0;
+  const draftEvals = evaluations.filter((e) => e.status === "draft");
+  const cities = new Set(organizations.map((o) => o.city).filter(Boolean));
+  const regions = new Set(organizations.map((o) => o.region).filter(Boolean));
+  const specialties = new Set(organizations.map((o) => o.specialty).filter(Boolean));
 
-  const sectionAvgData = sections.map((s, i) => {
-    const startId = i * 16 + 1;
-    const avg = submittedEvals.length > 0
-      ? Math.round(submittedEvals.reduce((sum, e) => sum + getSectionScore(e.scores, startId, 16), 0) / submittedEvals.length)
-      : 0;
-    return { name: s.name, score: avg, fill: sectionColors[i] };
+  // Recent evaluations (last 7 days)
+  const now = new Date();
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const recentEvals = evaluations.filter((e) => new Date(e.created_at) >= weekAgo);
+
+  // Evaluations by region
+  const orgMap = Object.fromEntries(organizations.map((o) => [o.id, o]));
+  const regionCounts: Record<string, number> = {};
+  submittedEvals.forEach((e) => {
+    const org = orgMap[e.organization_id];
+    if (org?.region) {
+      regionCounts[org.region] = (regionCounts[org.region] || 0) + 1;
+    }
   });
+  const regionData = Object.entries(regionCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
 
-  const orgScores = organizations.map((org) => {
-    const orgEvals = submittedEvals.filter((e) => e.organization_id === org.id);
-    const avg = orgEvals.length > 0
-      ? Math.round(orgEvals.reduce((s, e) => s + getOverallScore(e.scores), 0) / orgEvals.length)
-      : 0;
-    return { name: org.name, score: avg };
-  });
+  const barColors = ["hsl(var(--primary))", "hsl(var(--accent))", "hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))"];
 
-  const scoreDistribution = [
-    { name: "ممتاز (80+)", value: submittedEvals.filter((e) => getOverallScore(e.scores) >= 80).length },
-    { name: "جيد (60-79)", value: submittedEvals.filter((e) => { const s = getOverallScore(e.scores); return s >= 60 && s < 80; }).length },
-    { name: "متوسط (40-59)", value: submittedEvals.filter((e) => { const s = getOverallScore(e.scores); return s >= 40 && s < 60; }).length },
-    { name: "ضعيف (<40)", value: submittedEvals.filter((e) => getOverallScore(e.scores) < 40).length },
-  ].filter((d) => d.value > 0);
-
-  const pieColors = ["hsl(var(--success))", "hsl(var(--chart-1))", "hsl(var(--warning))", "hsl(var(--destructive))"];
-
-  const stats = [
-    { label: "إجمالي التقييمات", value: evaluations.length, icon: ClipboardCheck, color: "bg-primary/10 text-primary" },
-    { label: "عدد الجمعيات", value: organizations.length, icon: Building2, color: "bg-accent/10 text-accent" },
-    { label: "متوسط النتيجة", value: `${avgScore}%`, icon: TrendingUp, color: "bg-success/10 text-success" },
-  ];
+  // Recent evaluations list
+  const recentList = evaluations.slice(0, 8);
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold text-foreground">لوحة التحكم</h1>
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">لوحة التحكم</h1>
+        <p className="text-sm text-muted-foreground mt-1">نظرة عامة على إحصائيات المنصة</p>
+      </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {stats.map((stat, i) => (
-          <motion.div key={stat.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-            <Card className="border-0 shadow-sm">
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.color}`}>
-                  <stat.icon className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground">{stat.label}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+      {/* Main Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard icon={Building2} label="إجمالي الجمعيات" value={organizations.length} subtitle={`في ${cities.size} مدينة`} color="bg-primary text-primary" delay={0} />
+        <StatCard icon={ClipboardCheck} label="إجمالي التقييمات" value={evaluations.length} subtitle={`${submittedEvals.length} مكتمل · ${draftEvals.length} مسودة`} color="bg-accent text-accent" delay={0.1} />
+        <StatCard icon={Users} label="المستخدمون" value={userCount} color="bg-chart-1 text-chart-1" delay={0.2} />
+        <StatCard icon={MapPin} label="المناطق" value={regions.size} subtitle={`${specialties.size} تخصص`} color="bg-chart-2 text-chart-2" delay={0.3} />
+      </div>
+
+      {/* Secondary Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-4 text-center">
+              <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center mx-auto mb-2">
+                <TrendingUp className="w-5 h-5 text-success" />
+              </div>
+              <p className="text-2xl font-bold text-foreground">{submittedEvals.length}</p>
+              <p className="text-xs text-muted-foreground">تقييم مكتمل</p>
+            </CardContent>
+          </Card>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-4 text-center">
+              <div className="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center mx-auto mb-2">
+                <ClipboardCheck className="w-5 h-5 text-warning" />
+              </div>
+              <p className="text-2xl font-bold text-foreground">{draftEvals.length}</p>
+              <p className="text-xs text-muted-foreground">مسودة</p>
+            </CardContent>
+          </Card>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-4 text-center">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                <Calendar className="w-5 h-5 text-primary" />
+              </div>
+              <p className="text-2xl font-bold text-foreground">{recentEvals.length}</p>
+              <p className="text-xs text-muted-foreground">آخر 7 أيام</p>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Section Averages Bar Chart */}
+        {/* Region Chart */}
         <Card className="border-0 shadow-sm">
-          <CardHeader><CardTitle className="text-base">متوسط النتائج حسب المحور</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base">التقييمات حسب المنطقة</CardTitle></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={sectionAvgData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 12 }} />
-                <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={100} />
-                <Tooltip formatter={(v: number) => [`${v}%`, "النتيجة"]} />
-                <Bar dataKey="score" radius={[0, 6, 6, 0]} barSize={24}>
-                  {sectionAvgData.map((entry, i) => (<Cell key={i} fill={entry.fill} />))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Score Distribution Pie */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader><CardTitle className="text-base">توزيع مستويات التقييم</CardTitle></CardHeader>
-          <CardContent className="flex items-center justify-center">
-            {scoreDistribution.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie data={scoreDistribution} cx="50%" cy="50%" innerRadius={50} outerRadius={85} dataKey="value" label={({ name, value }) => `${name}: ${value}`} fontSize={10}>
-                    {scoreDistribution.map((_, i) => (<Cell key={i} fill={pieColors[i]} />))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <p className="text-muted-foreground text-sm py-12">لا توجد بيانات بعد</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Org Scores */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader><CardTitle className="text-base">نتائج الجمعيات</CardTitle></CardHeader>
-          <CardContent>
-            {orgScores.length > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={orgScores}>
+            {regionData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={regionData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                  <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
-                  <Tooltip formatter={(v: number) => [`${v}%`, "النتيجة"]} />
-                  <Bar dataKey="score" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} barSize={40} />
+                  <XAxis type="number" tick={{ fontSize: 12 }} />
+                  <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} width={100} />
+                  <Tooltip formatter={(v: number) => [v, "عدد التقييمات"]} />
+                  <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={24}>
+                    {regionData.map((_, i) => (<Cell key={i} fill={barColors[i % barColors.length]} />))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-muted-foreground text-sm py-12">لا توجد بيانات بعد</p>
+              <p className="text-muted-foreground text-sm py-12 text-center">لا توجد بيانات بعد</p>
             )}
           </CardContent>
         </Card>
 
-        {/* Radar Chart */}
+        {/* Recent Evaluations */}
         <Card className="border-0 shadow-sm">
-          <CardHeader><CardTitle className="text-base">تحليل شامل</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base">آخر التقييمات</CardTitle></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <RadarChart data={sectionAvgData}>
-                <PolarGrid stroke="hsl(var(--border))" />
-                <PolarAngleAxis dataKey="name" tick={{ fontSize: 10 }} />
-                <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
-                <Radar dataKey="score" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.2} strokeWidth={2} />
-              </RadarChart>
-            </ResponsiveContainer>
+            {recentList.length > 0 ? (
+              <div className="space-y-3">
+                {recentList.map((ev) => {
+                  const org = orgMap[ev.organization_id];
+                  return (
+                    <div key={ev.id} className="flex items-center justify-between py-2.5 border-b border-border/50 last:border-0">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Building2 className="w-4 h-4 text-primary" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">{org?.name || "—"}</p>
+                          <p className="text-xs text-muted-foreground">{new Date(ev.created_at).toLocaleDateString("ar-SA")}</p>
+                        </div>
+                      </div>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
+                        ev.status === "submitted" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
+                      }`}>
+                        {ev.status === "submitted" ? "مكتمل" : "مسودة"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-sm py-12 text-center">لا توجد تقييمات بعد</p>
+            )}
           </CardContent>
         </Card>
       </div>
-
-      {/* Recent Evaluations Table */}
-      <Card className="border-0 shadow-sm">
-        <CardHeader><CardTitle className="text-base">التقييمات الأخيرة</CardTitle></CardHeader>
-        <CardContent>
-          {evaluations.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-right py-3 px-2 font-medium text-muted-foreground">الجمعية</th>
-                    <th className="text-right py-3 px-2 font-medium text-muted-foreground">التاريخ</th>
-                    <th className="text-right py-3 px-2 font-medium text-muted-foreground">النتيجة</th>
-                    <th className="text-right py-3 px-2 font-medium text-muted-foreground">الحالة</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {evaluations.slice(0, 10).map((ev) => {
-                    const score = getOverallScore(ev.scores);
-                    return (
-                      <tr key={ev.id} className="border-b last:border-0 hover:bg-muted/50 transition-colors">
-                        <td className="py-3 px-2 font-medium">{orgMap[ev.organization_id] || "—"}</td>
-                        <td className="py-3 px-2 text-muted-foreground">{new Date(ev.created_at).toLocaleDateString("ar-SA")}</td>
-                        <td className="py-3 px-2">
-                          <span className={`font-bold ${getScoreColor(score)}`}>{score}%</span>
-                        </td>
-                        <td className="py-3 px-2">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            ev.status === "submitted" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
-                          }`}>
-                            {ev.status === "submitted" ? "مكتمل" : "مسودة"}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-sm py-8 text-center">لا توجد تقييمات بعد</p>
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 };

@@ -13,16 +13,15 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
-import { LayoutDashboard, ClipboardCheck, Building2, FileBarChart, LogOut, Menu, Users } from "lucide-react";
+import { LayoutDashboard, ClipboardCheck, Building2, LogOut, Menu, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ReactNode } from "react";
 
 const adminLinks = [
   { title: "لوحة التحكم", url: "/dashboard", icon: LayoutDashboard },
   { title: "التقييمات", url: "/evaluations", icon: ClipboardCheck },
-  { title: "المنظمات", url: "/organizations", icon: Building2 },
+  { title: "الجمعيات", url: "/organizations", icon: Building2 },
   { title: "المستخدمون", url: "/users", icon: Users },
-  { title: "النتائج", url: "/results", icon: FileBarChart },
 ];
 
 function AppSidebarContent() {

@@ -8,7 +8,7 @@ import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import EvaluationsListPage from "./pages/EvaluationsListPage";
 import OrganizationsPage from "./pages/OrganizationsPage";
-import ResultsPage from "./pages/ResultsPage";
+
 import UsersPage from "./pages/UsersPage";
 import PublicEvaluation from "./pages/PublicEvaluation";
 import AppLayout from "./components/layout/AppLayout";
@@ -47,8 +47,6 @@ function AppRoutes() {
       <Route path="/evaluations" element={<ProtectedRoute><EvaluationsListPage /></ProtectedRoute>} />
       <Route path="/organizations" element={<ProtectedRoute><OrganizationsPage /></ProtectedRoute>} />
       <Route path="/users" element={<ProtectedRoute><UsersPage /></ProtectedRoute>} />
-      <Route path="/results" element={<ProtectedRoute><ResultsPage /></ProtectedRoute>} />
-      <Route path="/results/:id" element={<ProtectedRoute><ResultsPage /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
