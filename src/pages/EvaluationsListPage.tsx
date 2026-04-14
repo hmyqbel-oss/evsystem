@@ -4,7 +4,8 @@ import { getOverallScore, getScoreColor } from "@/data/sampleData";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Plus, Eye, FileEdit, Loader2, Trash2 } from "lucide-react";
+import { Plus, Eye, FileEdit, Loader2, Trash2, Download } from "lucide-react";
+import { exportToExcel } from "@/lib/exportExcel";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
@@ -56,11 +57,35 @@ const EvaluationsListPage = () => {
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <h1 className="text-2xl font-bold text-foreground">التقييمات</h1>
-        <Link to="/evaluations/new">
-          <Button className="gap-2"><Plus className="w-4 h-4" /> تقييم جديد</Button>
-        </Link>
+        <div className="flex gap-2">
+          <Button variant="outline" className="gap-2" onClick={() => {
+            const exportData = evaluations.map((ev) => {
+              const numericScores: Record<number, number> = {};
+              if (ev.scores && typeof ev.scores === "object") {
+                Object.entries(ev.scores).forEach(([k, v]) => { numericScores[Number(k)] = v; });
+              }
+              return {
+                orgName: ev.organizations?.name || "—",
+                status: ev.status === "submitted" ? "مكتمل" : "مسودة",
+                score: getOverallScore(numericScores) + "%",
+                visit_number: ev.visit_number,
+                date: new Date(ev.created_at).toLocaleDateString("ar-SA"),
+              };
+            });
+            exportToExcel(
+              exportData as unknown as Record<string, unknown>[],
+              { orgName: "الجمعية", status: "الحالة", score: "النتيجة", visit_number: "رقم الزيارة", date: "التاريخ" },
+              "التقييمات"
+            );
+          }}>
+            <Download className="w-4 h-4" /> تصدير Excel
+          </Button>
+          <Link to="/evaluations/new">
+            <Button className="gap-2"><Plus className="w-4 h-4" /> تقييم جديد</Button>
+          </Link>
+        </div>
       </div>
 
       {evaluations.length === 0 ? (
