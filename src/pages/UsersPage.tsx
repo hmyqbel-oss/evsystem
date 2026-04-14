@@ -305,7 +305,7 @@ const UsersPage = () => {
             ))}
           </div>
         </>
-      )
+      )}
 
       {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
