@@ -46,15 +46,20 @@ const UsersPage = () => {
 
   const fetchUsers = async () => {
     setLoading(true);
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
+    try {
+      const [profilesRes, rolesRes] = await Promise.all([
+        supabase.from("profiles").select("*").order("created_at", { ascending: false }),
+        supabase.from("user_roles").select("user_id, role"),
+      ]);
 
-    const res = await supabase.functions.invoke("admin-create-user", {
-      body: { action: "list" },
-    });
-
-    if (res.data?.users) {
-      setUsers(res.data.users);
+      const rolesMap = new Map((rolesRes.data || []).map((r) => [r.user_id, r.role]));
+      const users = (profilesRes.data || []).map((p) => ({
+        ...p,
+        user_roles: [{ role: rolesMap.get(p.user_id) || "admin" }],
+      }));
+      setUsers(users as UserProfile[]);
+    } catch (err) {
+      console.error("Failed to fetch users:", err);
     }
     setLoading(false);
   };
