@@ -4,7 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Building2, MapPin, Phone, Mail, Briefcase, User, BadgeCheck, Edit, Trash2, Eye, Search, Loader2 } from "lucide-react";
+import { Plus, Building2, MapPin, Phone, Mail, Briefcase, User, BadgeCheck, Edit, Trash2, Eye, Search, Loader2, Download } from "lucide-react";
+import { exportToExcel } from "@/lib/exportExcel";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
@@ -206,12 +207,20 @@ const OrganizationsPage = () => {
           <h1 className="text-2xl font-bold text-foreground">إدارة الجمعيات</h1>
           <p className="text-sm text-muted-foreground mt-1">بطاقة تعريف الجمعيات — مشروع تطوير نماذج الاستدامة</p>
         </div>
-        <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) { resetForm(); setEditOrg(null); } }}>
-          <DialogTrigger asChild>
-            <Button className="gap-2 h-10 px-5 shadow-sm">
-              <Plus className="w-4 h-4" /> إضافة جمعية
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button variant="outline" className="gap-2 h-10" onClick={() => exportToExcel(
+            organizations as unknown as Record<string, unknown>[],
+            { name: "اسم الجمعية", region: "المنطقة", city: "المدينة", specialty: "التخصص", data_entry_name: "مدخل البيانات", data_entry_role: "الصفة", email: "البريد الإلكتروني", phone: "رقم الجوال" },
+            "الجمعيات"
+          )}>
+            <Download className="w-4 h-4" /> تصدير Excel
+          </Button>
+          <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) { resetForm(); setEditOrg(null); } }}>
+            <DialogTrigger asChild>
+              <Button className="gap-2 h-10 px-5 shadow-sm">
+                <Plus className="w-4 h-4" /> إضافة جمعية
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-lg">{editOrg ? "تعديل بيانات الجمعية" : "إضافة جمعية جديدة"}</DialogTitle>
@@ -219,6 +228,7 @@ const OrganizationsPage = () => {
             {orgForm}
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <div className="relative max-w-md">
