@@ -166,8 +166,8 @@ const EvaluationForm = () => {
                 <div className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold">{q.id}</span>
                   <div className="flex-1 space-y-3">
-                    <p className="text-sm font-medium leading-relaxed text-foreground">{q.questionText}</p>
-                    <p className="text-xs text-muted-foreground">الأدلة المطلوبة: {q.evidence}</p>
+                    <p className="text-sm sm:text-base font-medium leading-relaxed text-foreground">{q.questionText}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">الأدلة المطلوبة: {q.evidence}</p>
                     <RatingInput value={scores[q.id] || 0} onChange={(val) => handleScore(q.id, val)} />
                   </div>
                 </div>

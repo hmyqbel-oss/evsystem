@@ -275,7 +275,7 @@ const PublicEvaluation = () => {
             <Card className="shadow-sm overflow-hidden">
               <div className="bg-primary/5 border-b px-4 py-2.5 flex items-center gap-2">
                 <Building2 className="w-4 h-4 text-primary" />
-                <h2 className="text-xs sm:text-sm font-semibold text-foreground">معلومات الجمعية</h2>
+                <h2 className="text-sm sm:text-base font-semibold text-foreground">معلومات الجمعية</h2>
               </div>
               <CardContent className="p-5 space-y-4">
                 <IconField icon={Building2} label="اسم الجمعية" required>
