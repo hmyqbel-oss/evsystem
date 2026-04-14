@@ -42,7 +42,7 @@ const UsersPage = () => {
   const [formEmail, setFormEmail] = useState("");
   const [formPhone, setFormPhone] = useState("");
   const [formPassword, setFormPassword] = useState("");
-  const [formRole, setFormRole] = useState<string>("evaluator");
+  const [formRole, setFormRole] = useState<string>("admin");
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -69,7 +69,7 @@ const UsersPage = () => {
     setFormEmail("");
     setFormPhone("");
     setFormPassword("");
-    setFormRole("evaluator");
+    setFormRole("admin");
     setDialogOpen(true);
   };
 
@@ -79,7 +79,7 @@ const UsersPage = () => {
     setFormEmail(user.email);
     setFormPhone(user.phone || "");
     setFormPassword("");
-    setFormRole(user.user_roles?.[0]?.role || "evaluator");
+    setFormRole(user.user_roles?.[0]?.role || "admin");
     setDialogOpen(true);
   };
 
@@ -245,9 +245,7 @@ const UsersPage = () => {
                       <TableCell dir="ltr" className="text-left">{user.email}</TableCell>
                       <TableCell dir="ltr" className="text-left">{user.phone || "—"}</TableCell>
                       <TableCell>
-                        <Badge variant={user.user_roles?.[0]?.role === "admin" ? "default" : "secondary"}>
-                          {user.user_roles?.[0]?.role === "admin" ? "مدير" : "مُقيّم"}
-                        </Badge>
+                        <Badge variant="default">مدير</Badge>
                       </TableCell>
                       <TableCell>
                         <Badge variant={user.is_active ? "outline" : "destructive"} className={user.is_active ? "border-green-500 text-green-600" : ""}>
@@ -306,18 +304,7 @@ const UsersPage = () => {
               <label className="text-sm font-medium mb-1.5 block">رقم الهاتف</label>
               <Input value={formPhone} onChange={(e) => setFormPhone(e.target.value)} placeholder="05xxxxxxxx" dir="ltr" className="text-left" />
             </div>
-            <div>
-              <label className="text-sm font-medium mb-1.5 block">الدور *</label>
-              <Select value={formRole} onValueChange={setFormRole}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="evaluator">مُقيّم</SelectItem>
-                  <SelectItem value="admin">مدير</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <input type="hidden" value="admin" />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>إلغاء</Button>
