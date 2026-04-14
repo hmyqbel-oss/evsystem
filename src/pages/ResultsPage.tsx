@@ -5,7 +5,8 @@ import { sections, questions } from "@/data/assessmentQuestions";
 import { getSectionScore, getOverallScore, getScoreLabel, getScoreColor } from "@/data/sampleData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, Download } from "lucide-react";
+import { exportToExcel } from "@/lib/exportExcel";
 
 const ResultsPage = () => {
   const { id } = useParams<{ id: string }>();
