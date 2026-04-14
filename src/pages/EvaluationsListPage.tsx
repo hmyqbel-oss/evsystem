@@ -4,7 +4,7 @@ import { getOverallScore, getScoreColor } from "@/data/sampleData";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Plus, Eye, FileEdit, Loader2, Trash2, Download } from "lucide-react";
+import { Eye, FileEdit, Loader2, Trash2, Download } from "lucide-react";
 import { exportToExcel } from "@/lib/exportExcel";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
