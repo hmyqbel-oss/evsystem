@@ -84,14 +84,38 @@ const PublicEvaluation = () => {
   const [orgId, setOrgId] = useState<string | null>(null);
   const [evaluationId, setEvaluationId] = useState<string | null>(null);
   const [orgSaved, setOrgSaved] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const totalQuestions = 80;
   const answeredCount = Object.keys(scores).length;
   const progressPct = Math.round((answeredCount / totalQuestions) * 100);
 
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePhone = (phone: string) => /^05\d{8}$/.test(phone);
+
   const handleOrgFormChange = (field: string, value: string) => {
     setOrgForm((prev) => ({ ...prev, [field]: value }));
     if (orgSaved) setOrgSaved(false);
+
+    // Live validation
+    setFieldErrors((prev) => {
+      const next = { ...prev };
+      if (field === "email") {
+        if (value && !validateEmail(value)) {
+          next.email = "صيغة البريد الإلكتروني غير صحيحة";
+        } else {
+          delete next.email;
+        }
+      }
+      if (field === "phone") {
+        if (value && !validatePhone(value)) {
+          next.phone = "يجب أن يبدأ بـ 05 ويتكون من 10 أرقام";
+        } else {
+          delete next.phone;
+        }
+      }
+      return next;
+    });
   };
 
   const saveOrgData = async (): Promise<boolean> => {
@@ -115,8 +139,16 @@ const PublicEvaluation = () => {
       toast.error("يرجى إدخال البريد الإلكتروني");
       return false;
     }
+    if (!validateEmail(orgForm.email)) {
+      toast.error("صيغة البريد الإلكتروني غير صحيحة");
+      return false;
+    }
     if (!orgForm.phone.trim()) {
       toast.error("يرجى إدخال رقم الهاتف");
+      return false;
+    }
+    if (!validatePhone(orgForm.phone)) {
+      toast.error("رقم الهاتف يجب أن يبدأ بـ 05 ويتكون من 10 أرقام");
       return false;
     }
     setSaving(true);
@@ -397,8 +429,11 @@ const PublicEvaluation = () => {
                       onChange={(e) => handleOrgFormChange("email", e.target.value)}
                       placeholder="example@org.sa"
                       dir="ltr"
-                      className="text-right"
+                      className={`text-right ${fieldErrors.email ? "border-destructive" : ""}`}
                     />
+                    {fieldErrors.email && (
+                      <p className="text-xs text-destructive mt-1">{fieldErrors.email}</p>
+                    )}
                   </IconField>
                   <IconField icon={Phone} label="رقم الهاتف" required>
                     <Input
@@ -407,8 +442,11 @@ const PublicEvaluation = () => {
                       onChange={(e) => handleOrgFormChange("phone", e.target.value)}
                       placeholder="05XXXXXXXX"
                       dir="ltr"
-                      className="text-right"
+                      className={`text-right ${fieldErrors.phone ? "border-destructive" : ""}`}
                     />
+                    {fieldErrors.phone && (
+                      <p className="text-xs text-destructive mt-1">{fieldErrors.phone}</p>
+                    )}
                   </IconField>
                 </div>
               </CardContent>
