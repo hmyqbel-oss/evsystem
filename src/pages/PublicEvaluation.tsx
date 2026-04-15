@@ -329,17 +329,18 @@ const PublicEvaluation = () => {
                 <h2 className="text-sm sm:text-base font-semibold text-foreground">معلومات الجمعية</h2>
               </div>
               <CardContent className="p-5 space-y-4">
-                <IconField icon={Building2} label="اسم الجمعية" required>
+                <IconField icon={Building2} label="اسم الجمعية" required error={fieldErrors.name}>
                   <Input
                     value={orgForm.name}
                     onChange={(e) => handleOrgFormChange("name", e.target.value)}
                     placeholder="مثال: جمعية ..."
+                    className={fieldErrors.name ? "border-destructive" : ""}
                   />
                 </IconField>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <IconField icon={MapPin} label="المنطقة" required>
+                  <IconField icon={MapPin} label="المنطقة" required error={fieldErrors.region}>
                     <Select value={orgForm.region} onValueChange={(val) => handleOrgFormChange("region", val)}>
-                      <SelectTrigger>
+                      <SelectTrigger className={fieldErrors.region ? "border-destructive" : ""}>
                         <SelectValue placeholder="اختر المنطقة..." />
                       </SelectTrigger>
                       <SelectContent>
@@ -403,18 +404,20 @@ const PublicEvaluation = () => {
               </div>
               <CardContent className="p-5 space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <IconField icon={User} label="اسم مدخل البيانات" required>
+                  <IconField icon={User} label="اسم مدخل البيانات" required error={fieldErrors.data_entry_name}>
                     <Input
                       value={orgForm.data_entry_name}
                       onChange={(e) => handleOrgFormChange("data_entry_name", e.target.value)}
                       placeholder="الاسم الكامل"
+                      className={fieldErrors.data_entry_name ? "border-destructive" : ""}
                     />
                   </IconField>
-                  <IconField icon={BadgeCheck} label="صفته في الجمعية" required>
+                  <IconField icon={BadgeCheck} label="صفته في الجمعية" required error={fieldErrors.data_entry_role}>
                     <Input
                       value={orgForm.data_entry_role}
                       onChange={(e) => handleOrgFormChange("data_entry_role", e.target.value)}
                       placeholder="مثال: مدير تنفيذي، مسؤول الجودة..."
+                      className={fieldErrors.data_entry_role ? "border-destructive" : ""}
                     />
                   </IconField>
                 </div>
