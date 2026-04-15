@@ -128,6 +128,8 @@ const PublicEvaluation = () => {
     if (!orgForm.region) errors.region = "يرجى اختيار المنطقة";
     if (!orgForm.data_entry_name.trim()) errors.data_entry_name = "يرجى إدخال اسم مدخل البيانات";
     if (!orgForm.data_entry_role.trim()) errors.data_entry_role = "يرجى إدخال صفة مدخل البيانات";
+    if (!orgForm.license_number.trim()) errors.license_number = "يرجى إدخال رقم الترخيص";
+    if (!orgForm.establishment_year.trim()) errors.establishment_year = "يرجى إدخال سنة التأسيس";
     if (!orgForm.email.trim()) {
       errors.email = "يرجى إدخال البريد الإلكتروني";
     } else if (!validateEmail(orgForm.email)) {
