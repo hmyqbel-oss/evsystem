@@ -539,7 +539,7 @@ const PublicEvaluation = () => {
                     </span>
                     <div className="flex-1 space-y-3">
                       <p className="text-sm sm:text-base font-medium leading-relaxed text-foreground">{q.questionText}</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">أمثلة على بعض الأدلة التي تعينك في تقييم الاجابة على السؤال: {q.evidence}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">وثائق تدل على نضج مؤسستك في هذا المؤشر: {q.evidence}</p>
                       <RatingInput value={scores[q.id] || 0} onChange={(val) => handleScore(q.id, val)} />
                     </div>
                   </div>
