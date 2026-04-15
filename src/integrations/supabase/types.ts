@@ -62,7 +62,9 @@ export type Database = {
           data_entry_name: string
           data_entry_role: string
           email: string
+          establishment_year: number | null
           id: string
+          license_number: string | null
           name: string
           phone: string
           region: string
@@ -75,7 +77,9 @@ export type Database = {
           data_entry_name?: string
           data_entry_role?: string
           email?: string
+          establishment_year?: number | null
           id?: string
+          license_number?: string | null
           name: string
           phone?: string
           region?: string
@@ -88,7 +92,9 @@ export type Database = {
           data_entry_name?: string
           data_entry_role?: string
           email?: string
+          establishment_year?: number | null
           id?: string
+          license_number?: string | null
           name?: string
           phone?: string
           region?: string
