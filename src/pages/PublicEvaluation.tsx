@@ -375,14 +375,15 @@ const PublicEvaluation = () => {
                   </IconField>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <IconField icon={BadgeCheck} label="رقم الترخيص">
+                  <IconField icon={BadgeCheck} label="رقم الترخيص *" error={fieldErrors.license_number}>
                     <Input
                       value={orgForm.license_number}
                       onChange={(e) => handleOrgFormChange("license_number", e.target.value)}
                       placeholder="مثال: 12345"
+                      className={fieldErrors.license_number ? "border-destructive" : ""}
                     />
                   </IconField>
-                  <IconField icon={Building2} label="سنة التأسيس">
+                  <IconField icon={Building2} label="سنة التأسيس *" error={fieldErrors.establishment_year}>
                     <Input
                       type="number"
                       value={orgForm.establishment_year}
@@ -390,6 +391,7 @@ const PublicEvaluation = () => {
                       placeholder="مثال: 2020"
                       min="1900"
                       max={new Date().getFullYear()}
+                      className={fieldErrors.establishment_year ? "border-destructive" : ""}
                     />
                   </IconField>
                 </div>
