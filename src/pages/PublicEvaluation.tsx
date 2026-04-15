@@ -342,6 +342,25 @@ const PublicEvaluation = () => {
                     />
                   </IconField>
                 </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <IconField icon={BadgeCheck} label="رقم الترخيص">
+                    <Input
+                      value={orgForm.license_number}
+                      onChange={(e) => handleOrgFormChange("license_number", e.target.value)}
+                      placeholder="مثال: 12345"
+                    />
+                  </IconField>
+                  <IconField icon={Building2} label="سنة التأسيس">
+                    <Input
+                      type="number"
+                      value={orgForm.establishment_year}
+                      onChange={(e) => handleOrgFormChange("establishment_year", e.target.value)}
+                      placeholder="مثال: 2020"
+                      min="1900"
+                      max={new Date().getFullYear()}
+                    />
+                  </IconField>
+                </div>
               </CardContent>
             </Card>
           </motion.div>
