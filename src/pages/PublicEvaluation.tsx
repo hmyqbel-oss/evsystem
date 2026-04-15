@@ -422,7 +422,7 @@ const PublicEvaluation = () => {
                   </IconField>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <IconField icon={Mail} label="البريد الإلكتروني" required>
+                  <IconField icon={Mail} label="البريد الإلكتروني" required error={fieldErrors.email}>
                     <Input
                       type="email"
                       value={orgForm.email}
@@ -431,11 +431,8 @@ const PublicEvaluation = () => {
                       dir="ltr"
                       className={`text-right ${fieldErrors.email ? "border-destructive" : ""}`}
                     />
-                    {fieldErrors.email && (
-                      <p className="text-xs text-destructive mt-1">{fieldErrors.email}</p>
-                    )}
                   </IconField>
-                  <IconField icon={Phone} label="رقم الهاتف" required>
+                  <IconField icon={Phone} label="رقم الهاتف" required error={fieldErrors.phone}>
                     <Input
                       type="tel"
                       value={orgForm.phone}
@@ -444,9 +441,6 @@ const PublicEvaluation = () => {
                       dir="ltr"
                       className={`text-right ${fieldErrors.phone ? "border-destructive" : ""}`}
                     />
-                    {fieldErrors.phone && (
-                      <p className="text-xs text-destructive mt-1">{fieldErrors.phone}</p>
-                    )}
                   </IconField>
                 </div>
               </CardContent>
