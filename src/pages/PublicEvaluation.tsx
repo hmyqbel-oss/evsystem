@@ -429,8 +429,11 @@ const PublicEvaluation = () => {
                       onChange={(e) => handleOrgFormChange("email", e.target.value)}
                       placeholder="example@org.sa"
                       dir="ltr"
-                      className="text-right"
+                      className={`text-right ${fieldErrors.email ? "border-destructive" : ""}`}
                     />
+                    {fieldErrors.email && (
+                      <p className="text-xs text-destructive mt-1">{fieldErrors.email}</p>
+                    )}
                   </IconField>
                   <IconField icon={Phone} label="رقم الهاتف" required>
                     <Input
@@ -439,8 +442,11 @@ const PublicEvaluation = () => {
                       onChange={(e) => handleOrgFormChange("phone", e.target.value)}
                       placeholder="05XXXXXXXX"
                       dir="ltr"
-                      className="text-right"
+                      className={`text-right ${fieldErrors.phone ? "border-destructive" : ""}`}
                     />
+                    {fieldErrors.phone && (
+                      <p className="text-xs text-destructive mt-1">{fieldErrors.phone}</p>
+                    )}
                   </IconField>
                 </div>
               </CardContent>
