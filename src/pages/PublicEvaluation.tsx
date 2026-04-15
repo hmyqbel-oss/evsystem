@@ -147,38 +147,7 @@ const PublicEvaluation = () => {
   };
 
   const saveOrgData = async (): Promise<boolean> => {
-    if (!orgForm.name.trim()) {
-      toast.error("يرجى إدخال اسم الجمعية");
-      return false;
-    }
-    if (!orgForm.region) {
-      toast.error("يرجى اختيار المنطقة");
-      return false;
-    }
-    if (!orgForm.data_entry_name.trim()) {
-      toast.error("يرجى إدخال اسم مدخل البيانات");
-      return false;
-    }
-    if (!orgForm.data_entry_role.trim()) {
-      toast.error("يرجى إدخال صفة مدخل البيانات");
-      return false;
-    }
-    if (!orgForm.email.trim()) {
-      toast.error("يرجى إدخال البريد الإلكتروني");
-      return false;
-    }
-    if (!validateEmail(orgForm.email)) {
-      toast.error("صيغة البريد الإلكتروني غير صحيحة");
-      return false;
-    }
-    if (!orgForm.phone.trim()) {
-      toast.error("يرجى إدخال رقم الهاتف");
-      return false;
-    }
-    if (!validatePhone(orgForm.phone)) {
-      toast.error("رقم الهاتف يجب أن يبدأ بـ 05 ويتكون من 10 أرقام");
-      return false;
-    }
+    if (!validateAllFields()) return false;
     setSaving(true);
     try {
       const payload = {
