@@ -75,6 +75,7 @@ const PublicEvaluation = () => {
   const [step, setStep] = useState<Step>("org-info");
   const [orgForm, setOrgForm] = useState({
     name: "", city: "", region: "", specialty: "",
+    license_number: "", establishment_year: "",
     data_entry_name: "", data_entry_role: "", email: "", phone: "",
   });
   const [currentSection, setCurrentSection] = useState(0);
@@ -125,6 +126,8 @@ const PublicEvaluation = () => {
         city: orgForm.city,
         region: orgForm.region,
         specialty: orgForm.specialty,
+        license_number: orgForm.license_number,
+        establishment_year: orgForm.establishment_year ? parseInt(orgForm.establishment_year) : null,
         data_entry_name: orgForm.data_entry_name,
         data_entry_role: orgForm.data_entry_role,
         email: orgForm.email,
@@ -301,7 +304,7 @@ const PublicEvaluation = () => {
                   <Input
                     value={orgForm.name}
                     onChange={(e) => handleOrgFormChange("name", e.target.value)}
-                    placeholder="مثال: جمعية التنمية الاجتماعية"
+                    placeholder="مثال: جمعية ..."
                   />
                 </IconField>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
