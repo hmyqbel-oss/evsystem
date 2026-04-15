@@ -106,6 +106,18 @@ const PublicEvaluation = () => {
       toast.error("يرجى إدخال اسم مدخل البيانات");
       return false;
     }
+    if (!orgForm.data_entry_role.trim()) {
+      toast.error("يرجى إدخال صفة مدخل البيانات");
+      return false;
+    }
+    if (!orgForm.email.trim()) {
+      toast.error("يرجى إدخال البريد الإلكتروني");
+      return false;
+    }
+    if (!orgForm.phone.trim()) {
+      toast.error("يرجى إدخال رقم الهاتف");
+      return false;
+    }
     setSaving(true);
     try {
       const payload = {
@@ -347,7 +359,7 @@ const PublicEvaluation = () => {
                       placeholder="الاسم الكامل"
                     />
                   </IconField>
-                  <IconField icon={BadgeCheck} label="صفته في الجمعية">
+                  <IconField icon={BadgeCheck} label="صفته في الجمعية" required>
                     <Input
                       value={orgForm.data_entry_role}
                       onChange={(e) => handleOrgFormChange("data_entry_role", e.target.value)}
@@ -356,7 +368,7 @@ const PublicEvaluation = () => {
                   </IconField>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <IconField icon={Mail} label="البريد الإلكتروني">
+                  <IconField icon={Mail} label="البريد الإلكتروني" required>
                     <Input
                       type="email"
                       value={orgForm.email}
@@ -366,7 +378,7 @@ const PublicEvaluation = () => {
                       className="text-right"
                     />
                   </IconField>
-                  <IconField icon={Phone} label="رقم الهاتف">
+                  <IconField icon={Phone} label="رقم الهاتف" required>
                     <Input
                       type="tel"
                       value={orgForm.phone}
