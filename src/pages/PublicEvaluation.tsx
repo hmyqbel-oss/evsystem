@@ -612,18 +612,32 @@ const PublicEvaluation = () => {
 // ─── Helper Components ───
 
 function IconField({
-  icon: Icon, label, required, children,
+  icon: Icon, label, required, error, children,
 }: {
-  icon: any; label: string; required?: boolean; children: React.ReactNode;
+  icon: any; label: string; required?: boolean; error?: string; children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       <Label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
         <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         {label}
         {required && <span className="text-destructive">*</span>}
       </Label>
       {children}
+      <AnimatePresence>
+        {error && (
+          <motion.p
+            initial={{ opacity: 0, y: -4, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: "auto" }}
+            exit={{ opacity: 0, y: -4, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="text-xs text-destructive flex items-center gap-1 pr-1"
+          >
+            <span className="inline-block w-1 h-1 rounded-full bg-destructive" />
+            {error}
+          </motion.p>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
