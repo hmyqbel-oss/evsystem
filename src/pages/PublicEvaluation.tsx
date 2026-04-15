@@ -114,43 +114,40 @@ const PublicEvaluation = () => {
           delete next.phone;
         }
       }
+      // Clear "required" error when user types
+      if (value.trim() && next[field]?.includes("يرجى")) {
+        delete next[field];
+      }
       return next;
     });
   };
 
-  const saveOrgData = async (): Promise<boolean> => {
-    if (!orgForm.name.trim()) {
-      toast.error("يرجى إدخال اسم الجمعية");
-      return false;
-    }
-    if (!orgForm.region) {
-      toast.error("يرجى اختيار المنطقة");
-      return false;
-    }
-    if (!orgForm.data_entry_name.trim()) {
-      toast.error("يرجى إدخال اسم مدخل البيانات");
-      return false;
-    }
-    if (!orgForm.data_entry_role.trim()) {
-      toast.error("يرجى إدخال صفة مدخل البيانات");
-      return false;
-    }
+  const validateAllFields = (): boolean => {
+    const errors: Record<string, string> = {};
+    if (!orgForm.name.trim()) errors.name = "يرجى إدخال اسم الجمعية";
+    if (!orgForm.region) errors.region = "يرجى اختيار المنطقة";
+    if (!orgForm.data_entry_name.trim()) errors.data_entry_name = "يرجى إدخال اسم مدخل البيانات";
+    if (!orgForm.data_entry_role.trim()) errors.data_entry_role = "يرجى إدخال صفة مدخل البيانات";
     if (!orgForm.email.trim()) {
-      toast.error("يرجى إدخال البريد الإلكتروني");
-      return false;
-    }
-    if (!validateEmail(orgForm.email)) {
-      toast.error("صيغة البريد الإلكتروني غير صحيحة");
-      return false;
+      errors.email = "يرجى إدخال البريد الإلكتروني";
+    } else if (!validateEmail(orgForm.email)) {
+      errors.email = "صيغة البريد الإلكتروني غير صحيحة";
     }
     if (!orgForm.phone.trim()) {
-      toast.error("يرجى إدخال رقم الهاتف");
+      errors.phone = "يرجى إدخال رقم الهاتف";
+    } else if (!validatePhone(orgForm.phone)) {
+      errors.phone = "رقم الهاتف يجب أن يبدأ بـ 05 ويتكون من 10 أرقام";
+    }
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      toast.error("يرجى تعبئة جميع الحقول المطلوبة بشكل صحيح");
       return false;
     }
-    if (!validatePhone(orgForm.phone)) {
-      toast.error("رقم الهاتف يجب أن يبدأ بـ 05 ويتكون من 10 أرقام");
-      return false;
-    }
+    return true;
+  };
+
+  const saveOrgData = async (): Promise<boolean> => {
+    if (!validateAllFields()) return false;
     setSaving(true);
     try {
       const payload = {
@@ -332,17 +329,18 @@ const PublicEvaluation = () => {
                 <h2 className="text-sm sm:text-base font-semibold text-foreground">معلومات الجمعية</h2>
               </div>
               <CardContent className="p-5 space-y-4">
-                <IconField icon={Building2} label="اسم الجمعية" required>
+                <IconField icon={Building2} label="اسم الجمعية" required error={fieldErrors.name}>
                   <Input
                     value={orgForm.name}
                     onChange={(e) => handleOrgFormChange("name", e.target.value)}
                     placeholder="مثال: جمعية ..."
+                    className={fieldErrors.name ? "border-destructive" : ""}
                   />
                 </IconField>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <IconField icon={MapPin} label="المنطقة" required>
+                  <IconField icon={MapPin} label="المنطقة" required error={fieldErrors.region}>
                     <Select value={orgForm.region} onValueChange={(val) => handleOrgFormChange("region", val)}>
-                      <SelectTrigger>
+                      <SelectTrigger className={fieldErrors.region ? "border-destructive" : ""}>
                         <SelectValue placeholder="اختر المنطقة..." />
                       </SelectTrigger>
                       <SelectContent>
@@ -406,23 +404,25 @@ const PublicEvaluation = () => {
               </div>
               <CardContent className="p-5 space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <IconField icon={User} label="اسم مدخل البيانات" required>
+                  <IconField icon={User} label="اسم مدخل البيانات" required error={fieldErrors.data_entry_name}>
                     <Input
                       value={orgForm.data_entry_name}
                       onChange={(e) => handleOrgFormChange("data_entry_name", e.target.value)}
                       placeholder="الاسم الكامل"
+                      className={fieldErrors.data_entry_name ? "border-destructive" : ""}
                     />
                   </IconField>
-                  <IconField icon={BadgeCheck} label="صفته في الجمعية" required>
+                  <IconField icon={BadgeCheck} label="صفته في الجمعية" required error={fieldErrors.data_entry_role}>
                     <Input
                       value={orgForm.data_entry_role}
                       onChange={(e) => handleOrgFormChange("data_entry_role", e.target.value)}
                       placeholder="مثال: مدير تنفيذي، مسؤول الجودة..."
+                      className={fieldErrors.data_entry_role ? "border-destructive" : ""}
                     />
                   </IconField>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <IconField icon={Mail} label="البريد الإلكتروني" required>
+                  <IconField icon={Mail} label="البريد الإلكتروني" required error={fieldErrors.email}>
                     <Input
                       type="email"
                       value={orgForm.email}
@@ -431,11 +431,8 @@ const PublicEvaluation = () => {
                       dir="ltr"
                       className={`text-right ${fieldErrors.email ? "border-destructive" : ""}`}
                     />
-                    {fieldErrors.email && (
-                      <p className="text-xs text-destructive mt-1">{fieldErrors.email}</p>
-                    )}
                   </IconField>
-                  <IconField icon={Phone} label="رقم الهاتف" required>
+                  <IconField icon={Phone} label="رقم الهاتف" required error={fieldErrors.phone}>
                     <Input
                       type="tel"
                       value={orgForm.phone}
@@ -444,9 +441,6 @@ const PublicEvaluation = () => {
                       dir="ltr"
                       className={`text-right ${fieldErrors.phone ? "border-destructive" : ""}`}
                     />
-                    {fieldErrors.phone && (
-                      <p className="text-xs text-destructive mt-1">{fieldErrors.phone}</p>
-                    )}
                   </IconField>
                 </div>
               </CardContent>
@@ -612,18 +606,32 @@ const PublicEvaluation = () => {
 // ─── Helper Components ───
 
 function IconField({
-  icon: Icon, label, required, children,
+  icon: Icon, label, required, error, children,
 }: {
-  icon: any; label: string; required?: boolean; children: React.ReactNode;
+  icon: any; label: string; required?: boolean; error?: string; children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       <Label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
         <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         {label}
         {required && <span className="text-destructive">*</span>}
       </Label>
       {children}
+      <AnimatePresence>
+        {error && (
+          <motion.p
+            initial={{ opacity: 0, y: -4, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: "auto" }}
+            exit={{ opacity: 0, y: -4, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="text-xs text-destructive flex items-center gap-1 pr-1"
+          >
+            <span className="inline-block w-1 h-1 rounded-full bg-destructive" />
+            {error}
+          </motion.p>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
