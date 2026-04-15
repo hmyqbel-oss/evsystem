@@ -114,8 +114,36 @@ const PublicEvaluation = () => {
           delete next.phone;
         }
       }
+      // Clear "required" error when user types
+      if (value.trim() && next[field]?.includes("يرجى")) {
+        delete next[field];
+      }
       return next;
     });
+  };
+
+  const validateAllFields = (): boolean => {
+    const errors: Record<string, string> = {};
+    if (!orgForm.name.trim()) errors.name = "يرجى إدخال اسم الجمعية";
+    if (!orgForm.region) errors.region = "يرجى اختيار المنطقة";
+    if (!orgForm.data_entry_name.trim()) errors.data_entry_name = "يرجى إدخال اسم مدخل البيانات";
+    if (!orgForm.data_entry_role.trim()) errors.data_entry_role = "يرجى إدخال صفة مدخل البيانات";
+    if (!orgForm.email.trim()) {
+      errors.email = "يرجى إدخال البريد الإلكتروني";
+    } else if (!validateEmail(orgForm.email)) {
+      errors.email = "صيغة البريد الإلكتروني غير صحيحة";
+    }
+    if (!orgForm.phone.trim()) {
+      errors.phone = "يرجى إدخال رقم الهاتف";
+    } else if (!validatePhone(orgForm.phone)) {
+      errors.phone = "رقم الهاتف يجب أن يبدأ بـ 05 ويتكون من 10 أرقام";
+    }
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      toast.error("يرجى تعبئة جميع الحقول المطلوبة بشكل صحيح");
+      return false;
+    }
+    return true;
   };
 
   const saveOrgData = async (): Promise<boolean> => {
